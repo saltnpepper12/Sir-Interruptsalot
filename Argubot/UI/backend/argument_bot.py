@@ -38,7 +38,14 @@ class SassyArgumentBot:
             if var in os.environ:
                 del os.environ[var]
         
-        self.client = anthropic.Anthropic(api_key=api_key)
+        # Create a custom httpx client without proxy settings
+        import httpx
+        http_client = httpx.Client(
+            timeout=httpx.Timeout(30.0),
+            limits=httpx.Limits(max_keepalive_connections=5, max_connections=10)
+        )
+        
+        self.client = anthropic.Anthropic(api_key=api_key, http_client=http_client)
         self.session = None
 
     async def get_bot_response(self, user_message: str) -> str:

@@ -49,6 +49,7 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
   const [surrenderHover, setSurrenderHover] = useState(false);
   const [expandedCards, setExpandedCards] = useState<Set<string>>(new Set());
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const hasInitialized = useRef(false);
 
   const cookingMessages = [
     "Analyzing your argument patterns... 🧠",
@@ -65,12 +66,9 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
 
   // Auto-start session if initial message is provided
   useEffect(() => {
-    if (initialUserMessage && !sessionId && !gameStarted) {
-      const hasInitialized = useRef(false);
-      if (!hasInitialized.current) {
-        hasInitialized.current = true;
-        startArgumentSession(initialUserMessage);
-      }
+    if (initialUserMessage && !sessionId && !gameStarted && !hasInitialized.current) {
+      hasInitialized.current = true;
+      startArgumentSession(initialUserMessage);
     }
   }, [initialUserMessage, sessionId, gameStarted]);
 

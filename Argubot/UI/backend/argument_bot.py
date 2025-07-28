@@ -28,6 +28,16 @@ class SassyArgumentBot:
         if not api_key:
             raise ValueError("ANTHROPIC_API_KEY environment variable is required")
         
+        # Clear all proxy environment variables that cause issues with anthropic
+        proxy_vars = [
+            'HTTP_PROXY', 'HTTPS_PROXY', 'http_proxy', 'https_proxy',
+            'HTTP_PROXY_PORT', 'HTTPS_PROXY_PORT', 'NO_PROXY', 'no_proxy',
+            'ALL_PROXY', 'all_proxy', 'FTP_PROXY', 'ftp_proxy'
+        ]
+        for var in proxy_vars:
+            if var in os.environ:
+                del os.environ[var]
+        
         self.client = anthropic.Anthropic(api_key=api_key)
         self.session = None
 
@@ -64,7 +74,7 @@ class SassyArgumentBot:
         IMPORTANT: Do NOT use any asterisk formatting like *adjusts glasses* or markdown like **bold text**. Write naturally like a real person arguing."""
         
         response = await self.client.messages.create(
-            model="claude-3-sonnet-20240229",
+            model="claude-3-5-sonnet-20241022",
             max_tokens=150,
             messages=[{"role": "user", "content": bot_prompt}]
         )
@@ -120,7 +130,7 @@ class SassyArgumentBot:
         IMPORTANT: Do NOT use any asterisk formatting like *adjusts glasses* or markdown like **bold text**. Write naturally like a real person arguing."""
         
         response = await self.client.messages.create(
-            model="claude-3-sonnet-20240229",
+            model="claude-3-5-sonnet-20241022",
             max_tokens=180, # Adjusted for brevity
             messages=[{"role": "user", "content": bot_prompt}]
         )
@@ -157,7 +167,7 @@ class SassyArgumentBot:
         }}"""
 
         response = await self.client.messages.create(
-            model="claude-3-sonnet-20240229",
+            model="claude-3-5-sonnet-20241022",
             max_tokens=200,
             messages=[{"role": "user", "content": judge_prompt}]
         )
@@ -214,7 +224,7 @@ class SassyArgumentBot:
         Make it entertaining, witty, and playfully snarky but not mean!"""
         
         response = await self.client.messages.create(
-            model="claude-3-sonnet-20240229",
+            model="claude-3-5-sonnet-20241022",
             max_tokens=600,
             messages=[{"role": "user", "content": persona_prompt}]
         )

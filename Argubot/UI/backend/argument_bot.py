@@ -64,7 +64,7 @@ class SassyArgumentBot:
         IMPORTANT: Do NOT use any asterisk formatting like *adjusts glasses* or markdown like **bold text**. Write naturally like a real person arguing."""
         
         response = await self.client.messages.create(
-            model="claude-3-5-sonnet-20241022",
+            model="claude-3-sonnet-20240229",
             max_tokens=150,
             messages=[{"role": "user", "content": bot_prompt}]
         )
@@ -120,7 +120,7 @@ class SassyArgumentBot:
         IMPORTANT: Do NOT use any asterisk formatting like *adjusts glasses* or markdown like **bold text**. Write naturally like a real person arguing."""
         
         response = await self.client.messages.create(
-            model="claude-3-5-sonnet-20241022",
+            model="claude-3-sonnet-20240229",
             max_tokens=180, # Adjusted for brevity
             messages=[{"role": "user", "content": bot_prompt}]
         )
@@ -157,7 +157,7 @@ class SassyArgumentBot:
         }}"""
 
         response = await self.client.messages.create(
-            model="claude-3-5-sonnet-20241022",
+            model="claude-3-sonnet-20240229",
             max_tokens=200,
             messages=[{"role": "user", "content": judge_prompt}]
         )
@@ -214,7 +214,7 @@ class SassyArgumentBot:
         Make it entertaining, witty, and playfully snarky but not mean!"""
         
         response = await self.client.messages.create(
-            model="claude-3-5-sonnet-20241022",
+            model="claude-3-sonnet-20240229",
             max_tokens=600,
             messages=[{"role": "user", "content": persona_prompt}]
         )

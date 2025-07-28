@@ -73,6 +73,7 @@ async def search_facts(query: str) -> List[dict]:
         return []
     
     try:
+        import httpx
         url = "https://google.serper.dev/search"
         headers = {
             "X-API-KEY": serper_api_key,
@@ -83,21 +84,22 @@ async def search_facts(query: str) -> List[dict]:
             "num": 3
         }
         
-        response = requests.post(url, headers=headers, json=payload)
-        response.raise_for_status()
-        
-        data = response.json()
-        facts = []
-        
-        if "organic" in data:
-            for result in data["organic"][:3]:
-                facts.append({
-                    "title": result.get("title", ""),
-                    "link": result.get("link", ""),
-                    "snippet": result.get("snippet", "")
-                })
-        
-        return facts
+        async with httpx.AsyncClient() as client:
+            response = await client.post(url, headers=headers, json=payload)
+            response.raise_for_status()
+            
+            data = response.json()
+            facts = []
+            
+            if "organic" in data:
+                for result in data["organic"][:3]:
+                    facts.append({
+                        "title": result.get("title", ""),
+                        "link": result.get("link", ""),
+                        "snippet": result.get("snippet", "")
+                    })
+            
+            return facts
     except Exception as e:
         print(f"Error searching facts: {e}")
         return []
@@ -117,16 +119,22 @@ def generate_status_update(user_score: int, bot_score: int, time_remaining: int)
 @app.post("/start_session", response_model=ArgumentResponse)
 async def start_session(request: ArgumentRequest):
     try:
+        print(f"Starting session with message: {request.message}")
+        
         # Initialize session with the initial user message
         bot.session = ArgumentSession()
         bot.session.start_time = datetime.now()
         bot.session.is_active = True
         
+        print("Session initialized successfully")
+        
         # Get facts for the initial argument
         facts = await search_facts(request.message)
+        print(f"Found {len(facts)} facts")
         
         # Get bot's first response with facts
         bot_response = await bot.get_bot_response_with_facts(request.message, facts)
+        print(f"Bot response generated: {len(bot_response)} characters")
         
         # Format sources for response
         sources = []
@@ -138,7 +146,7 @@ async def start_session(request: ArgumentRequest):
                     "snippet": fact.get("snippet", "")
                 })
         
-        return ArgumentResponse(
+        response = ArgumentResponse(
             bot_response=bot_response,
             session_id=bot.session.session_id,
             user_score=bot.session.user_score,
@@ -147,7 +155,14 @@ async def start_session(request: ArgumentRequest):
             game_ended=False,
             sources=sources
         )
+        
+        print("Session started successfully")
+        return response
+        
     except Exception as e:
+        print(f"Error in start_session: {str(e)}")
+        import traceback
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=f"Error starting session: {str(e)}")
 
 @app.post("/send_argument", response_model=ArgumentResponse)

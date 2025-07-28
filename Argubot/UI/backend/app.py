@@ -7,6 +7,7 @@ from datetime import datetime
 import requests
 import json
 import sys
+import httpx
 
 # Add the current directory to Python path
 sys.path.append(os.path.dirname(__file__))
@@ -74,7 +75,6 @@ async def search_facts(query: str) -> List[dict]:
         return []
     
     try:
-        import httpx
         url = "https://google.serper.dev/search"
         headers = {
             "X-API-KEY": serper_api_key,
@@ -130,12 +130,20 @@ async def start_session(request: ArgumentRequest):
         print("Session initialized successfully")
         
         # Get facts for the initial argument
-        facts = await search_facts(request.message)
-        print(f"Found {len(facts)} facts")
+        try:
+            facts = await search_facts(request.message)
+            print(f"Found {len(facts)} facts")
+        except Exception as e:
+            print(f"Error getting facts: {e}")
+            facts = []
         
         # Get bot's first response with facts
-        bot_response = await bot.get_bot_response_with_facts(request.message, facts)
-        print(f"Bot response generated: {len(bot_response)} characters")
+        try:
+            bot_response = await bot.get_bot_response_with_facts(request.message, facts)
+            print(f"Bot response generated: {len(bot_response)} characters")
+        except Exception as e:
+            print(f"Error getting bot response: {e}")
+            bot_response = "I'm ready to argue! What's your point?"
         
         # Format sources for response
         sources = []

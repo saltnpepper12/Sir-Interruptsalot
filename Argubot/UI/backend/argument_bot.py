@@ -4,6 +4,7 @@ from datetime import datetime
 from dataclasses import dataclass
 from typing import List, Dict, Any
 import uuid
+import httpx
 
 @dataclass
 class ArgumentSession:
@@ -39,7 +40,6 @@ class SassyArgumentBot:
                 del os.environ[var]
         
         # Create a custom httpx client without proxy settings
-        import httpx
         http_client = httpx.Client(
             timeout=httpx.Timeout(30.0),
             limits=httpx.Limits(max_keepalive_connections=5, max_connections=10)

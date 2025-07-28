@@ -43,6 +43,7 @@ class ArgumentResponse(BaseModel):
     time_remaining: int
     game_ended: bool
     sources: List[dict] = []
+    status_update: Optional[str] = None
 
 class SourceInfo(BaseModel):
     title: str
@@ -146,6 +147,9 @@ async def start_session(request: ArgumentRequest):
                     "snippet": fact.get("snippet", "")
                 })
         
+        # Generate initial status update
+        status_update = generate_status_update(bot.session.user_score, bot.session.bot_score, 300)
+        
         response = ArgumentResponse(
             bot_response=bot_response,
             session_id=bot.session.session_id,
@@ -153,7 +157,8 @@ async def start_session(request: ArgumentRequest):
             bot_score=bot.session.bot_score,
             time_remaining=300,  # 5 minutes
             game_ended=False,
-            sources=sources
+            sources=sources,
+            status_update=status_update
         )
         
         print("Session started successfully")
@@ -212,6 +217,9 @@ async def send_argument(request: ArgumentRequest):
         
         time_remaining = max(0, 300 - int(elapsed_time))
         
+        # Generate status update
+        status_update = generate_status_update(bot.session.user_score, bot.session.bot_score, time_remaining)
+        
         return ArgumentResponse(
             bot_response=bot_response,
             session_id=bot.session.session_id,
@@ -219,7 +227,8 @@ async def send_argument(request: ArgumentRequest):
             bot_score=bot.session.bot_score,
             time_remaining=time_remaining,
             game_ended=False,
-            sources=sources
+            sources=sources,
+            status_update=status_update
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error processing argument: {str(e)}")

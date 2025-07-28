@@ -154,6 +154,14 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
       setIsLoading(true);
       setCurrentJudgeRuling(null);
 
+      // Add user message immediately for better UX
+      const userMessage = {
+        role: 'user' as const,
+        content: message,
+        timestamp: new Date().toISOString()
+      };
+      setMessages(prev => [...prev, userMessage]);
+
       const response = await fetch(`${API_BASE_URL}/send_argument`, {
         method: 'POST',
         headers: {
@@ -176,24 +184,24 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
       setTimeRemaining(data.time_remaining);
       setGameEnded(data.game_ended);
 
-      // Add new messages
-      setMessages(prev => [
-        ...prev,
-        {
-          role: 'user',
-          content: message,
-          timestamp: new Date().toISOString()
-        },
-        {
-          role: 'bot',
-          content: data.bot_response,
-          timestamp: new Date().toISOString(),
-          sources: data.sources
-        }
-      ]);
+      // Add bot response
+      const botMessage = {
+        role: 'bot' as const,
+        content: data.bot_response,
+        timestamp: new Date().toISOString(),
+        sources: data.sources
+      };
+      setMessages(prev => [...prev, botMessage]);
+
+      // Update judge ruling if available
+      if (data.status_update) {
+        setCurrentJudgeRuling(data.status_update);
+      }
 
     } catch (error) {
       console.error('Error sending argument:', error);
+      // Remove the user message if there was an error
+      setMessages(prev => prev.slice(0, -1));
     } finally {
       setIsLoading(false);
     }
@@ -557,8 +565,8 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
         </div>
 
         {/* Chat Area */}
-        <Card className="bg-gray-900 border-gray-700 min-h-[70vh] flex flex-col">
-          <div className="flex-1 overflow-y-auto p-6 space-y-4 max-h-[60vh]">
+        <Card className="bg-gray-900 border-gray-700 min-h-[80vh] flex flex-col">
+          <div className="flex-1 overflow-y-auto p-6 space-y-4 max-h-[70vh]">
             {messages.length === 0 && !isLoading ? (
               <div className="text-center text-white/60 py-8">
                 <p>Waiting for Sir Interruptsalot to respond...</p>

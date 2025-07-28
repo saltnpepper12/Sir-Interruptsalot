@@ -8,6 +8,7 @@ import requests
 import json
 import sys
 import httpx
+import anthropic
 
 # Add the current directory to Python path
 sys.path.append(os.path.dirname(__file__))
@@ -67,6 +68,104 @@ async def root():
 @app.get("/health")
 async def health_check():
     return {"status": "healthy", "service": "Sir Interruptsalot API"}
+
+@app.get("/test_api")
+async def test_api():
+    """Test endpoint to check if Anthropic API key is working"""
+    try:
+        print("=== TESTING ANTHROPIC API KEY ===")
+        
+        # Test 1: Check if API key exists
+        api_key = os.getenv("ANTHROPIC_API_KEY")
+        if not api_key:
+            print("❌ ERROR: ANTHROPIC_API_KEY not found in environment")
+            return {"error": "ANTHROPIC_API_KEY not found", "status": "failed"}
+        
+        print(f"✅ API Key found: {api_key[:10]}...{api_key[-4:]}")
+        
+        # Test 2: Try to create Anthropic client
+        try:
+            test_client = anthropic.Anthropic(api_key=api_key)
+            print("✅ Anthropic client created successfully")
+        except Exception as e:
+            print(f"❌ ERROR creating Anthropic client: {str(e)}")
+            return {"error": f"Failed to create client: {str(e)}", "status": "failed"}
+        
+        # Test 3: Try a simple API call
+        try:
+            print("🔄 Testing API call...")
+            response = test_client.messages.create(
+                model="claude-3-5-sonnet-20241022",
+                max_tokens=50,
+                messages=[{"role": "user", "content": "Say 'Hello World' in one sentence."}]
+            )
+            
+            result = response.content[0].text
+            print(f"✅ API call successful! Response: {result}")
+            
+            return {
+                "status": "success",
+                "api_key": f"{api_key[:10]}...{api_key[-4:]}",
+                "response": result,
+                "message": "Anthropic API is working correctly"
+            }
+            
+        except Exception as e:
+            print(f"❌ ERROR in API call: {str(e)}")
+            return {"error": f"API call failed: {str(e)}", "status": "failed"}
+            
+    except Exception as e:
+        print(f"❌ UNEXPECTED ERROR: {str(e)}")
+        return {"error": f"Unexpected error: {str(e)}", "status": "failed"}
+
+@app.get("/test_serper")
+async def test_serper():
+    """Test endpoint to check if Serper API key is working"""
+    try:
+        print("=== TESTING SERPER API KEY ===")
+        
+        # Test 1: Check if API key exists
+        serper_api_key = os.getenv("SERPER_API_KEY")
+        if not serper_api_key:
+            print("❌ ERROR: SERPER_API_KEY not found in environment")
+            return {"error": "SERPER_API_KEY not found", "status": "failed"}
+        
+        print(f"✅ Serper API Key found: {serper_api_key[:10]}...{serper_api_key[-4:]}")
+        
+        # Test 2: Try a simple search
+        try:
+            print("🔄 Testing Serper API call...")
+            url = "https://google.serper.dev/search"
+            headers = {
+                "X-API-KEY": serper_api_key,
+                "Content-Type": "application/json"
+            }
+            payload = {
+                "q": "test query",
+                "num": 1
+            }
+            
+            async with httpx.AsyncClient() as client:
+                response = await client.post(url, headers=headers, json=payload)
+                response.raise_for_status()
+                
+                data = response.json()
+                print(f"✅ Serper API call successful! Found {len(data.get('organic', []))} results")
+                
+                return {
+                    "status": "success",
+                    "api_key": f"{serper_api_key[:10]}...{serper_api_key[-4:]}",
+                    "results_count": len(data.get('organic', [])),
+                    "message": "Serper API is working correctly"
+                }
+                
+        except Exception as e:
+            print(f"❌ ERROR in Serper API call: {str(e)}")
+            return {"error": f"Serper API call failed: {str(e)}", "status": "failed"}
+            
+    except Exception as e:
+        print(f"❌ UNEXPECTED ERROR: {str(e)}")
+        return {"error": f"Unexpected error: {str(e)}", "status": "failed"}
 
 async def search_facts(query: str) -> List[dict]:
     """Search for facts using Serper API"""

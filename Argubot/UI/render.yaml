@@ -1,0 +1,24 @@
+services:
+  # Backend Service
+  - type: web
+    name: sir-interruptsalot-backend
+    env: python
+    plan: free
+    buildCommand: pip install -r Argubot/UI/backend/requirements.txt
+    startCommand: uvicorn Argubot.UI.backend.app:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: SERPER_API_KEY
+        sync: false
+
+  # Frontend Service
+  - type: web
+    name: sir-interruptsalot-frontend
+    env: static
+    plan: free
+    buildCommand: cd Argubot/UI && npm install && npm run build
+    staticPublishPath: Argubot/UI/dist
+    envVars:
+      - key: VITE_API_BASE_URL
+        value: https://sir-interruptsalot-backend.onrender.com 

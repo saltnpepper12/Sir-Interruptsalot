@@ -1,193 +1,180 @@
-# 🔥 Sir Interruptsalot - The Undefeated Debate Champion
+# Sir Interruptsalot - The Undefeated Debate Champion
 
-A beautiful React frontend integrated with a powerful FastAPI backend for real-time AI arguments with Claude!
+An AI-powered argument bot that challenges users to debate while providing factual information and generating personality roast reports.
 
-## ✨ Features
+## 🚀 Deployment on Render
 
-- **🎨 Sleek Black Theme** with bright yellow highlights
-- **⚡ Real-time AI Arguments** powered by Claude API
-- **📊 Live Scoring System** with AI judge
-- **⏱️ 5-minute timed sessions**
-- **📝 Personality Reports** after each game
-- **🔗 Factual Sources** - AI arguments backed by real-time search data with clickable links
-- **🚀 Modern Tech Stack** - React + FastAPI + Claude + Serper
+This project requires **two separate services** on Render:
 
-## 🛠️ Tech Stack
+### 1. Backend API Service
+- **Type**: Web Service (Python)
+- **Path**: `Argubot/UI/backend/`
 
-### Frontend
-- **React 18** with TypeScript
-- **Vite** for fast development
-- **Tailwind CSS** for styling
-- **Framer Motion** for animations
-- **Radix UI** components
+### 2. Frontend Service  
+- **Type**: Static Site
+- **Path**: `Argubot/UI/`
 
-### Backend
-- **FastAPI** for REST API
-- **Claude AI** (Anthropic) for arguments
-- **Pydantic** for data validation
-- **Uvicorn** ASGI server
+## 📋 Manual Deployment Instructions
 
-## 📋 Prerequisites
+### **Step 1: Deploy Backend API**
 
-- **Python 3.8+**
-- **Node.js 16+**
-- **Anthropic API Key** ([Get one here](https://console.anthropic.com/))
+1. Go to [Render Dashboard](https://dashboard.render.com/)
+2. Click **"New +"** → **"Web Service"**
+3. Connect your GitHub repository: `saltnpepper12/Sir-Interruptsalot`
+4. Configure settings:
+   - **Name**: `sir-interruptsalot-backend`
+   - **Environment**: `Python 3`
+   - **Build Command**: `pip install -r Argubot/UI/backend/requirements.txt`
+   - **Start Command**: `uvicorn Argubot.UI.backend.app:app --host 0.0.0.0 --port $PORT`
 
-## 🚀 Quick Start
+5. Set Environment Variables:
+   ```
+   ANTHROPIC_API_KEY = your_anthropic_api_key_here
+   SERPER_API_KEY = your_serper_api_key_here (optional)
+   ```
 
-### Option 1: Automatic Setup (Recommended)
+6. Click **"Create Web Service"**
 
-**Windows:**
+### **Step 2: Deploy Frontend**
+
+1. Go to [Render Dashboard](https://dashboard.render.com/)
+2. Click **"New +"** → **"Static Site"**
+3. Connect your GitHub repository: `saltnpepper12/Sir-Interruptsalot`
+4. Configure settings:
+   - **Name**: `sir-interruptsalot-frontend`
+   - **Build Command**: `cd Argubot/UI && npm install && npm run build`
+   - **Publish Directory**: `Argubot/UI/dist`
+
+5. Set Environment Variable:
+   ```
+   VITE_API_BASE_URL = https://sir-interruptsalot-backend.onrender.com
+   ```
+
+6. Click **"Create Static Site"**
+
+## 🎯 Features
+
+- ✅ **AI-powered argument bot** with personality
+- ✅ **Real-time factual information** with source citations
+- ✅ **Impartial judging system** with scoring
+- ✅ **Personality roast reports** after sessions
+- ✅ **5-minute time limit** for intense debates
+- ✅ **Beautiful dark theme UI** with animations
+- ✅ **Legal industry inspiration** popup
+- ✅ **"Let him cook" loading animations**
+
+## 🛠️ Local Development
+
+### Prerequisites
+- Node.js 18+
+- Python 3.8+
+- Anthropic API key
+- Serper API key (optional)
+
+### Backend Setup
 ```bash
-# Double-click start.bat or run:
-start.bat
+cd Argubot/UI/backend
+pip install -r requirements.txt
+uvicorn app:app --reload --host 0.0.0.0 --port 8000
 ```
 
-**Linux/Mac:**
+### Frontend Setup
 ```bash
-chmod +x start.sh
-./start.sh
+cd Argubot/UI
+npm install
+npm run dev
 ```
 
-### Option 2: Manual Setup
+### Combined Setup
+```bash
+cd Argubot/UI
+npm install
+npm run start  # Runs both frontend and backend
+```
 
-1. **Clone and navigate:**
-   ```bash
-   cd Argubot/UI
-   ```
+## 🌐 API Endpoints
 
-2. **Set up backend:**
-   ```bash
-   cd backend
-   pip install -r requirements.txt
-   
-   # Create .env file and add your API keys:
-   echo "ANTHROPIC_API_KEY=your_anthropic_key_here" > .env
-   echo "SERPER_API_KEY=your_serper_key_here" >> .env
-   ```
+### Health Check
+```
+GET /
+GET /health
+```
 
-3. **Set up frontend:**
-   ```bash
-   cd ..
-   npm install
-   ```
+### Argument Session
+```
+POST /start_session
+POST /send_argument  
+POST /end_session
+```
 
-4. **Start both servers:**
-   ```bash
-   npm run start
-   ```
+## 🔧 Environment Variables
 
-## 🔑 Environment Setup
-
-Create `backend/.env` file:
+### Backend (.env)
 ```env
 ANTHROPIC_API_KEY=your_anthropic_api_key_here
 SERPER_API_KEY=your_serper_api_key_here
 ```
 
-**Get your API keys:**
-- **Anthropic API**: [Anthropic Console](https://console.anthropic.com/) - Powers the AI argument bot
-- **Serper API**: [Serper.dev](https://serper.dev/) - Provides real-time factual information and sources
+### Frontend (Vite)
+```env
+VITE_API_BASE_URL=https://sir-interruptsalot-backend.onrender.com
+```
 
-## 📡 API Endpoints
+## 📁 Project Structure
 
-The backend exposes these endpoints:
-
-- `POST /api/session/start` - Start new argument session
-- `POST /api/argument` - Send argument and get response
-- `GET /api/session/{id}/status` - Get session status
-- `POST /api/session/{id}/end` - End session and get report
+```
+Sir-Interruptsalot/
+├── Argubot/
+│   ├── UI/ (React frontend)
+│   │   ├── components/
+│   │   ├── backend/ (FastAPI backend)
+│   │   └── package.json
+│   └── README.md
+└── SassyArguBot/ (Original Chainlit version)
+```
 
 ## 🎮 How to Play
 
-1. **Enter Your Argument** - Type your strongest opinion
-2. **Start the Battle** - Click "Start the Argument!"
-3. **Argue Back & Forth** - AI will disagree with everything
-4. **Get Scored** - AI judge awards points each round
-5. **Win or Lose** - See your final score and personality report!
+1. **Enter your argument** in the text box
+2. **Click "Start Argument"** to begin
+3. **Argue back and forth** with Sir Interruptsalot
+4. **Win rounds** with logic, wit, and creativity
+5. **Get your personality roast** when you give up!
 
-## 🔧 Development
+## 🚀 Deployment URLs
 
-### Run Frontend Only
-```bash
-npm run dev
-```
+After deployment, your services will be available at:
+- **Frontend**: `https://sir-interruptsalot-frontend.onrender.com`
+- **Backend API**: `https://sir-interruptsalot-backend.onrender.com`
 
-### Run Backend Only
-```bash
-npm run backend
-```
+## 🔧 Troubleshooting
 
-### Run Both Together
-```bash
-npm run start
-```
+### Common Issues
 
-## 📦 Build for Production
+1. **API Connection Errors**
+   - Verify `VITE_API_BASE_URL` is set correctly
+   - Check backend service is running
 
-```bash
-npm run build
-```
+2. **Build Failures**
+   - Ensure all dependencies are installed
+   - Check Node.js and Python versions
 
-## 🚢 Deployment Options
+3. **Environment Variables**
+   - Verify API keys are set in Render dashboard
+   - Check variable names match exactly
 
-```bash
-# Netlify
-npm run deploy:netlify
+### Logs
+- Check Render logs for both services
+- Monitor API health endpoint: `/health`
 
-# Vercel
-npm run deploy:vercel
+## 📞 Support
 
-# Surge
-npm run deploy:surge
-```
-
-## 🎯 Project Structure
-
-```
-Argubot/UI/
-├── src/
-│   ├── App.tsx              # Main React app
-│   ├── components/
-│   │   ├── Arena.tsx        # Argument interface
-│   │   └── ui/              # Reusable components
-│   └── styles/
-│       └── globals.css      # Global styles
-├── backend/
-│   ├── app.py              # FastAPI server
-│   ├── requirements.txt    # Python dependencies
-│   └── .env               # API keys (create this)
-├── package.json           # Node.js dependencies
-├── start.sh              # Linux/Mac startup
-├── start.bat            # Windows startup
-└── README.md           # This file
-```
-
-## 🐛 Troubleshooting
-
-**Backend not starting?**
-- Check Python version: `python --version`
-- Install requirements: `pip install -r backend/requirements.txt`
-- Verify API key in `backend/.env`
-
-**Frontend not loading?**
-- Check Node version: `node --version`
-- Clear cache: `npm cache clean --force`
-- Reinstall: `rm -rf node_modules && npm install`
-
-**API errors?**
-- Verify your Anthropic API key is valid
-- Check backend is running on port 8000
-- Look for CORS errors in browser console
-
-## 📄 License
-
-MIT License - feel free to use this for your own debate AI projects!
-
-## 🎉 Credits
-
-Built with ❤️ for maximum sass and AI-powered arguments!
+For issues:
+1. Check Render deployment logs
+2. Verify environment variables
+3. Test API endpoints
+4. Review local development setup
 
 ---
 
-**Ready to argue?** Start the app and let Sir Interruptsalot tear apart your opinions! 🔥
+**Ready to challenge Sir Interruptsalot? Deploy and start arguing!** ⚔️🎉

@@ -7,7 +7,7 @@ import { ArrowLeft, Clock, Send, Trophy, ExternalLink, Flag, ChevronDown, Chevro
 import { motion } from "framer-motion";
 
 // API Configuration
-const API_BASE_URL = "http://localhost:8000";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
 
 interface ArenaProps {
   roomName: string;
@@ -765,7 +765,7 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
                 <div className="text-center">
                   <p className="text-lg mb-2">Enter your argument to begin</p>
                     <p className="text-sm">Sir Interruptsalot is waiting for your challenge...</p>
-                  </div>
+                </div>
               </div>
             ) : (
                 <div className="space-y-4 max-h-[60vh] overflow-y-auto">

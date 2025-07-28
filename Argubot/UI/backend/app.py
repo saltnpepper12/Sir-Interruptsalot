@@ -1,280 +1,229 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from typing import Optional, Dict, Any
+from typing import List, Optional
 import os
-from dotenv import load_dotenv
-import sys
-import asyncio
+from datetime import datetime
 import requests
 import json
-from datetime import datetime
-from typing import List, Dict
+from argument_bot import SassyArgumentBot, ArgumentSession
 
-# Add the SassyArguBot directory to the path so we can import the bot
-sys.path.append(os.path.join(os.path.dirname(__file__), "../../../SassyArguBot"))
-from argument_bot import SassyArgumentBot
+app = FastAPI(
+    title="Sir Interruptsalot API",
+    description="The Undefeated Debate Champion - AI Argument Bot API",
+    version="1.0.0"
+)
 
-# Load environment variables
-load_dotenv()
-
-app = FastAPI(title="Sir Interruptsalot API", description="The Undefeated Debate Champion API")
-
-# Enable CORS for React frontend
+# Configure CORS for production
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://localhost:5174", "http://localhost:3000"],
+    allow_origins=["*"],  # In production, specify your frontend domain
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Global bot instance and sessions storage
-bots: Dict[str, SassyArgumentBot] = {}
+# Global bot instance
+bot = SassyArgumentBot()
 
-# Serper API function for real fact-checking
-async def search_facts(query: str) -> List[Dict]:
-    """Search for factual information using Serper API"""
+class ArgumentRequest(BaseModel):
+    message: str
+    session_id: Optional[str] = None
+
+class ArgumentResponse(BaseModel):
+    bot_response: str
+    session_id: str
+    user_score: int
+    bot_score: int
+    time_remaining: int
+    game_ended: bool
+    sources: List[dict] = []
+
+class SourceInfo(BaseModel):
+    title: str
+    link: str
+    snippet: str
+
+@app.get("/")
+async def root():
+    return {
+        "message": "Welcome to Sir Interruptsalot API!",
+        "description": "The Undefeated Debate Champion",
+        "endpoints": {
+            "start_session": "POST /start_session",
+            "send_argument": "POST /send_argument",
+            "end_session": "POST /end_session",
+            "health": "GET /health"
+        }
+    }
+
+@app.get("/health")
+async def health_check():
+    return {"status": "healthy", "service": "Sir Interruptsalot API"}
+
+async def search_facts(query: str) -> List[dict]:
+    """Search for facts using Serper API"""
     serper_api_key = os.getenv("SERPER_API_KEY")
     if not serper_api_key:
         return []
     
-    url = "https://google.serper.dev/search"
-    payload = json.dumps({
-        "q": query,
-        "num": 3  # Get top 3 results
-    })
-    headers = {
-        'X-API-KEY': serper_api_key,
-        'Content-Type': 'application/json'
-    }
-    
     try:
-        response = requests.request("POST", url, headers=headers, data=payload)
-        data = response.json()
+        url = "https://google.serper.dev/search"
+        headers = {
+            "X-API-KEY": serper_api_key,
+            "Content-Type": "application/json"
+        }
+        payload = {
+            "q": query,
+            "num": 3
+        }
         
+        response = requests.post(url, headers=headers, json=payload)
+        response.raise_for_status()
+        
+        data = response.json()
         facts = []
-        if 'organic' in data:
-            for result in data['organic'][:3]:  # Top 3 results
+        
+        if "organic" in data:
+            for result in data["organic"][:3]:
                 facts.append({
-                    "title": result.get('title', ''),
-                    "snippet": result.get('snippet', ''),
-                    "link": result.get('link', ''),
-                    "source": result.get('link', '').split('/')[2] if result.get('link') else ''
+                    "title": result.get("title", ""),
+                    "link": result.get("link", ""),
+                    "snippet": result.get("snippet", "")
                 })
+        
         return facts
     except Exception as e:
-        print(f"Serper API error: {e}")
+        print(f"Error searching facts: {e}")
         return []
 
-# Pydantic models for API requests/responses
-class StartSessionRequest(BaseModel):
-    initial_message: str
+def generate_status_update(user_score: int, bot_score: int, time_remaining: int) -> str:
+    """Generate a status update message"""
+    if time_remaining <= 0:
+        return "⏰ Time's up! Final scores are locked in!"
+    
+    if user_score > bot_score:
+        return f"🔥 You're leading {user_score}-{bot_score}! Keep the momentum going!"
+    elif bot_score > user_score:
+        return f"😈 Sir Interruptsalot is ahead {bot_score}-{user_score}! Time to step up your game!"
+    else:
+        return f"⚖️ It's a tie at {user_score}-{user_score}! This is getting intense!"
 
-class ArgumentRequest(BaseModel):
-    session_id: str
-    message: str
-
-class SourceInfo(BaseModel):
-    title: str
-    url: str
-    snippet: str
-
-class ArgumentResponse(BaseModel):
-    bot_response: str
-    user_points: int
-    bot_points: int
-    judge_explanation: str
-    session_active: bool
-    time_remaining: int
-    status_update: str
-    sources: List[SourceInfo] = []
-
-class SessionResponse(BaseModel):
-    session_id: str
-    message: str
-    session_active: bool = True
-
-@app.get("/")
-async def root():
-    return {"message": "Sir Interruptsalot API is running!"}
-
-@app.post("/api/session/start", response_model=SessionResponse)
-async def start_session(request: StartSessionRequest):
-    """Start a new argument session with initial user message"""
+@app.post("/start_session", response_model=ArgumentResponse)
+async def start_session(request: ArgumentRequest):
     try:
-        # Get API key
-        api_key = os.getenv("ANTHROPIC_API_KEY")
-        if not api_key:
-            raise HTTPException(status_code=500, detail="ANTHROPIC_API_KEY not configured")
+        # Initialize session with the initial user message
+        bot.session = ArgumentSession()
+        bot.session.start_time = datetime.now()
+        bot.session.is_active = True
         
-        # Create new bot instance and session
-        bot = SassyArgumentBot(api_key)
-        # Initialize session manually without welcome message
-        from argument_bot import ArgumentSession
-        bot.session = ArgumentSession(start_time=datetime.now())
+        # Get facts for the initial argument
+        facts = await search_facts(request.message)
         
-        # Search for facts related to the initial argument
-        search_query = f"{request.initial_message} facts statistics data research"
-        facts = await search_facts(search_query)
-        
-        # Process the initial user message with facts
-        bot_response = await bot.get_bot_response_with_facts(request.initial_message, facts)
-        
-        # Generate a simple session ID (in production, use UUID)
-        session_id = f"session_{len(bots) + 1}_{int(asyncio.get_event_loop().time())}"
-        bots[session_id] = bot
-        
-        # Return just the bot response (frontend handles welcome message)
-        # bot_response already contains the sassy AI response
-
-        return SessionResponse(
-            session_id=session_id,
-            message=bot_response,
-            session_active=True
-        )
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to start session: {str(e)}")
-
-@app.post("/api/argument", response_model=ArgumentResponse)
-async def send_argument(request: ArgumentRequest):
-    """Send user argument and get bot response with scoring"""
-    try:
-        # Get bot instance
-        if request.session_id not in bots:
-            raise HTTPException(status_code=404, detail="Session not found")
-        
-        bot = bots[request.session_id]
-        
-        # Check if session is still active
-        if not bot.session or not bot.session.is_active:
-            return ArgumentResponse(
-                bot_response="Session has ended! Time's up!",
-                user_points=bot.session.user_points if bot.session else 0,
-                bot_points=bot.session.bot_points if bot.session else 0,
-                judge_explanation="Session expired",
-                session_active=False,
-                time_remaining=0,
-                status_update="",
-                sources=[]
-            )
-        
-        # Search for facts related to the user's argument
-        search_query = f"{request.message} facts statistics data research"
-        facts = await search_facts(search_query)
-        
-        # Get bot response with factual information
+        # Get bot's first response with facts
         bot_response = await bot.get_bot_response_with_facts(request.message, facts)
         
-        # Judge the argument round
-        try:
-            user_points, bot_points, explanation = await bot.judge_argument_round(request.message, bot_response)
-        except Exception as e:
-            # Fallback if judging fails
-            user_points, bot_points, explanation = 0, 0, f"Judge error: {str(e)}"
-        
-        # Get current state
-        total_user_points = bot.session.user_points
-        total_bot_points = bot.session.bot_points
-        time_remaining = bot.get_time_remaining()
-        session_active = bot.session.is_active
-        
-        # Generate status update (from Chainlit app.py)
-        status_update = generate_status_update(total_user_points, total_bot_points, time_remaining)
-        
-        # Convert facts to SourceInfo format
-        sources = [
-            SourceInfo(
-                title=fact.get('title', ''),
-                url=fact.get('link', ''),
-                snippet=fact.get('snippet', '')
-            ) for fact in facts
-        ]
+        # Format sources for response
+        sources = []
+        if facts:
+            for fact in facts:
+                sources.append({
+                    "title": fact.get("title", ""),
+                    "link": fact.get("link", ""),
+                    "snippet": fact.get("snippet", "")
+                })
         
         return ArgumentResponse(
             bot_response=bot_response,
-            user_points=total_user_points,
-            bot_points=total_bot_points,
-            judge_explanation=explanation,
-            session_active=session_active,
-            time_remaining=time_remaining,
-            status_update=status_update,
+            session_id=bot.session.session_id,
+            user_score=bot.session.user_score,
+            bot_score=bot.session.bot_score,
+            time_remaining=300,  # 5 minutes
+            game_ended=False,
             sources=sources
         )
-    except HTTPException:
-        raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to process argument: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error starting session: {str(e)}")
 
-@app.get("/api/session/{session_id}/status")
-async def get_session_status(session_id: str):
-    """Get current session status"""
-    if session_id not in bots:
-        raise HTTPException(status_code=404, detail="Session not found")
-    
-    bot = bots[session_id]
-    if not bot.session:
-        raise HTTPException(status_code=404, detail="No active session")
-    
-    return {
-        "session_active": bot.session.is_active,
-        "user_points": bot.session.user_points,
-        "bot_points": bot.session.bot_points,
-        "time_remaining": bot.get_time_remaining()
-    }
-
-@app.post("/api/session/{session_id}/end")
-async def end_session(session_id: str):
-    """End session and get personality report"""
-    if session_id not in bots:
-        raise HTTPException(status_code=404, detail="Session not found")
-    
-    bot = bots[session_id]
-    if not bot.session:
-        raise HTTPException(status_code=404, detail="No active session")
-    
+@app.post("/send_argument", response_model=ArgumentResponse)
+async def send_argument(request: ArgumentRequest):
     try:
-        final_report = await bot.end_session()
-        # Clean up session
-        del bots[session_id]
+        if not bot.session or not bot.session.is_active:
+            raise HTTPException(status_code=400, detail="No active session")
+        
+        # Check if time is up
+        elapsed_time = (datetime.now() - bot.session.start_time).total_seconds()
+        if elapsed_time >= 300:  # 5 minutes
+            bot.session.is_active = False
+            return ArgumentResponse(
+                bot_response="⏰ Time's up! The argument session has ended.",
+                session_id=bot.session.session_id,
+                user_score=bot.session.user_score,
+                bot_score=bot.session.bot_score,
+                time_remaining=0,
+                game_ended=True,
+                sources=[]
+            )
+        
+        # Get facts for the argument
+        facts = await search_facts(request.message)
+        
+        # Get bot response with facts
+        bot_response = await bot.get_bot_response_with_facts(request.message, facts)
+        
+        # Judge the round
+        judge_result = await bot.judge_argument_round(request.message, bot_response)
+        
+        # Update scores
+        if judge_result["winner"] == "user":
+            bot.session.user_score += 1
+        elif judge_result["winner"] == "bot":
+            bot.session.bot_score += 1
+        
+        # Format sources for response
+        sources = []
+        if facts:
+            for fact in facts:
+                sources.append({
+                    "title": fact.get("title", ""),
+                    "link": fact.get("link", ""),
+                    "snippet": fact.get("snippet", "")
+                })
+        
+        time_remaining = max(0, 300 - int(elapsed_time))
+        
+        return ArgumentResponse(
+            bot_response=bot_response,
+            session_id=bot.session.session_id,
+            user_score=bot.session.user_score,
+            bot_score=bot.session.bot_score,
+            time_remaining=time_remaining,
+            game_ended=False,
+            sources=sources
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error processing argument: {str(e)}")
+
+@app.post("/end_session")
+async def end_session(request: ArgumentRequest):
+    try:
+        if not bot.session:
+            raise HTTPException(status_code=400, detail="No active session")
+        
+        # Generate personality report
+        report = await bot.generate_persona_report()
+        
+        # End the session
+        bot.session.is_active = False
         
         return {
-            "final_report": final_report,
-            "user_points": bot.session.user_points,
-            "bot_points": bot.session.bot_points
+            "session_id": bot.session.session_id,
+            "final_report": report,
+            "final_scores": {
+                "user": bot.session.user_score,
+                "bot": bot.session.bot_score
+            },
+            "total_time": (datetime.now() - bot.session.start_time).total_seconds()
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to end session: {str(e)}")
-
-def generate_status_update(user_points: int, bot_points: int, time_remaining: int) -> str:
-    """Generate status update message (from Chainlit app.py)"""
-    minutes = time_remaining // 60
-    seconds = time_remaining % 60
-    
-    # Determine who's winning
-    if user_points > bot_points:
-        status_emoji = "🔥"
-        status_text = "You're WINNING!"
-    elif bot_points > user_points:
-        status_emoji = "😏"  
-        status_text = "Sir Interruptsalot is WINNING!"
-    else:
-        status_emoji = "⚔️"
-        status_text = "It's a TIE!"
-    
-    status_message = f"""{status_emoji} **ARGUMENT STATUS** {status_emoji}
-
-⏱️ **Time Remaining:** {minutes}:{seconds:02d}
-📊 **Current Scores:**
-   • You: **{user_points}** points
-   • Sir Interruptsalot: **{bot_points}** points
-
-🎯 **Status:** {status_text}
-
-Keep arguing! Every exchange counts! 💪"""
-    
-    return status_message
-
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000) 
+        raise HTTPException(status_code=500, detail=f"Error ending session: {str(e)}") 

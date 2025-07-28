@@ -1,0 +1,5 @@
+chainlit==1.0.505
+anthropic==0.34.2
+python-dotenv==1.0.0
+asyncio-timeout==4.0.3
+pydantic==2.5.3 

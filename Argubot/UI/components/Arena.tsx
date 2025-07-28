@@ -510,7 +510,7 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
 
   return (
     <div className="min-h-screen bg-black text-white p-4" style={{ backgroundColor: '#000000' }}>
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center space-x-4">
@@ -564,112 +564,146 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
           </div>
         </div>
 
-        {/* Chat Area */}
-        <Card className="bg-gray-900 border-gray-700 min-h-[80vh] flex flex-col">
-          <div className="flex-1 overflow-y-auto p-6 space-y-4 max-h-[70vh]">
-            {messages.length === 0 && !isLoading ? (
-              <div className="text-center text-white/60 py-8">
-                <p>Waiting for Sir Interruptsalot to respond...</p>
-              </div>
-            ) : (
-              messages.map((message, index) => (
-                <div key={index} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`max-w-[80%] ${message.role === 'user' ? 'bg-blue-600' : 'bg-gray-700'} rounded-lg p-3`}>
-                    <div className="flex items-center space-x-2 mb-2">
-                      <span className="text-xs text-white/60">
-                        {message.role === 'user' ? 'You' : 'Sir Interruptsalot'}
-                      </span>
-                      <span className="text-xs text-white/40">
-                        {new Date(message.timestamp).toLocaleTimeString()}
-                      </span>
-                    </div>
-                    
-                    <div className="text-white whitespace-pre-line">
-                      {message.content}
-                    </div>
-                    
-                    {/* Sources for bot messages */}
-                    {message.sources && message.sources.length > 0 && (
-                      <div className="mt-3 pt-3 border-t border-white/20">
-                        <p className="text-xs text-yellow mb-2" style={{ color: '#ffcd1a' }}>
-                          📚 Sources Referenced:
-                        </p>
-                        <div className="space-y-1">
-                          {message.sources.map((source, idx) => (
-                            <a
-                              key={idx}
-                              href={source.link}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="block text-xs text-blue-400 hover:text-blue-300 transition-colors"
-                            >
-                              • {source.title || source.snippet.substring(0, 50)}...
-                            </a>
-                          ))}
+        {/* Main Content Area */}
+        <div className="flex gap-6">
+          {/* Chat Area */}
+          <div className="flex-1">
+            <Card className="bg-gray-900 border-gray-700 min-h-[80vh] flex flex-col">
+              <div className="flex-1 overflow-y-auto p-6 space-y-4 max-h-[70vh]">
+                {messages.length === 0 && !isLoading ? (
+                  <div className="text-center text-white/60 py-8">
+                    <p>Waiting for Sir Interruptsalot to respond...</p>
+                  </div>
+                ) : (
+                  messages.map((message, index) => (
+                    <div key={index} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                      <div className={`max-w-[80%] ${message.role === 'user' ? 'bg-blue-600' : 'bg-gray-700'} rounded-lg p-3`}>
+                        <div className="flex items-center space-x-2 mb-2">
+                          <span className="text-xs text-white/60">
+                            {message.role === 'user' ? 'You' : 'Sir Interruptsalot'}
+                          </span>
+                          <span className="text-xs text-white/40">
+                            {new Date(message.timestamp).toLocaleTimeString()}
+                          </span>
                         </div>
+                        
+                        <div className="text-white whitespace-pre-line">
+                          {message.role === 'bot' && message.sources && message.sources.length > 0 ? (
+                            <div>
+                              {message.content.split(/\[SOURCE: ([^\]]+)\]/).map((part, idx) => {
+                                if (idx % 2 === 0) {
+                                  return <span key={idx}>{part}</span>;
+                                } else {
+                                  const sourceIndex = Math.floor(idx / 2);
+                                  const source = message.sources![sourceIndex];
+                                  return (
+                                    <a
+                                      key={idx}
+                                      href={source.link}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="text-blue-400 hover:text-blue-300 underline font-medium transition-colors"
+                                    >
+                                      {part}
+                                    </a>
+                                  );
+                                }
+                              })}
+                            </div>
+                          ) : (
+                            message.content
+                          )}
+                        </div>
+                        
+                        {/* Sources section for bot messages */}
+                        {message.sources && message.sources.length > 0 && (
+                          <div className="mt-3 pt-3 border-t border-white/20">
+                            <p className="text-xs text-yellow mb-2" style={{ color: '#ffcd1a' }}>
+                              📚 Sources Referenced:
+                            </p>
+                            <div className="space-y-1">
+                              {message.sources.map((source, idx) => (
+                                <a
+                                  key={idx}
+                                  href={source.link}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="block text-xs text-blue-400 hover:text-blue-300 transition-colors"
+                                >
+                                  • {source.title || source.snippet.substring(0, 50)}...
+                                </a>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                       </div>
-                    )}
+                    </div>
+                  ))
+                )}
+                
+                {isLoading && (
+                  <div className="flex justify-start">
+                    <div className="bg-gray-700 rounded-lg p-3">
+                      <div className="flex items-center space-x-2">
+                        <div className="w-2 h-2 bg-yellow rounded-full animate-pulse" style={{ backgroundColor: '#ffcd1a' }}></div>
+                        <div className="w-2 h-2 bg-yellow rounded-full animate-pulse" style={{ backgroundColor: '#ffcd1a' }}></div>
+                        <div className="w-2 h-2 bg-yellow rounded-full animate-pulse" style={{ backgroundColor: '#ffcd1a' }}></div>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              ))
-            )}
-            
-            {isLoading && (
-              <div className="flex justify-start">
-                <div className="bg-gray-700 rounded-lg p-3">
-                  <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-yellow rounded-full animate-pulse" style={{ backgroundColor: '#ffcd1a' }}></div>
-                    <div className="w-2 h-2 bg-yellow rounded-full animate-pulse" style={{ backgroundColor: '#ffcd1a' }}></div>
-                    <div className="w-2 h-2 bg-yellow rounded-full animate-pulse" style={{ backgroundColor: '#ffcd1a' }}></div>
-                  </div>
+                )}
+                
+                <div ref={messagesEndRef} />
+              </div>
+
+              {/* Input Area */}
+              <div className="border-t border-gray-700 p-4">
+                <div className="flex space-x-2">
+                  <Input
+                    value={userInput}
+                    onChange={(e) => setUserInput(e.target.value)}
+                    onKeyPress={handleKeyPress}
+                    placeholder="Type your argument here..."
+                    disabled={isLoading || gameEnded}
+                    className="flex-1 bg-gray-800 border-gray-600 text-white placeholder-white/50"
+                  />
+                  <Button
+                    onClick={handleSubmitArgument}
+                    disabled={!userInput.trim() || isLoading || gameEnded}
+                    className="bg-yellow hover:bg-yellow/90 text-black font-semibold"
+                    style={{ backgroundColor: '#ffcd1a', color: '#000000' }}
+                  >
+                    <Send className="w-4 h-4" />
+                  </Button>
                 </div>
               </div>
-            )}
-            
-            <div ref={messagesEndRef} />
+            </Card>
           </div>
 
-          {/* Input Area */}
-          <div className="border-t border-gray-700 p-4">
-            <div className="flex space-x-2">
-              <Input
-                value={userInput}
-                onChange={(e) => setUserInput(e.target.value)}
-                onKeyPress={handleKeyPress}
-                placeholder="Type your argument here..."
-                disabled={isLoading || gameEnded}
-                className="flex-1 bg-gray-800 border-gray-600 text-white placeholder-white/50"
-              />
-              <Button
-                onClick={handleSubmitArgument}
-                disabled={!userInput.trim() || isLoading || gameEnded}
-                className="bg-yellow hover:bg-yellow/90 text-black font-semibold"
-                style={{ backgroundColor: '#ffcd1a', color: '#000000' }}
+          {/* Judge Ruling Sidebar */}
+          {currentJudgeRuling && (
+            <div className="w-80">
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                className="sticky top-4"
               >
-                <Send className="w-4 h-4" />
-              </Button>
+                <Card className="bg-gray-900 border-gray-700 p-4">
+                  <div className="flex items-center space-x-2 mb-3">
+                    <Trophy className="w-5 h-5 text-yellow" style={{ color: '#ffcd1a' }} />
+                    <span className="font-semibold text-yellow text-lg" style={{ color: '#ffcd1a' }}>
+                      Judge's Insight
+                    </span>
+                  </div>
+                  <div className="text-white/90 text-sm leading-relaxed">
+                    {currentJudgeRuling}
+                  </div>
+                </Card>
+              </motion.div>
             </div>
-          </div>
-        </Card>
-
-        {/* Judge Ruling Box */}
-        {currentJudgeRuling && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="mt-4 p-4 bg-yellow/10 border border-yellow/30 rounded-lg"
-            style={{ backgroundColor: 'rgba(255, 205, 26, 0.1)', borderColor: 'rgba(255, 205, 26, 0.3)' }}
-          >
-            <div className="flex items-center space-x-2 mb-2">
-              <Trophy className="w-5 h-5 text-yellow" style={{ color: '#ffcd1a' }} />
-              <span className="font-semibold text-yellow" style={{ color: '#ffcd1a' }}>
-                Judge's Ruling
-              </span>
-            </div>
-            <p className="text-white/90">{currentJudgeRuling}</p>
-          </motion.div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );

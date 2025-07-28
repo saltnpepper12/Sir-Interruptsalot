@@ -148,7 +148,7 @@ async def start_session(request: ArgumentRequest):
                 })
         
         # Generate initial status update
-        status_update = "🎯 Ready to argue! Make your case and I'll judge each round."
+        status_update = generate_status_update(bot.session.user_score, bot.session.bot_score, 300)
         
         response = ArgumentResponse(
             bot_response=bot_response,
@@ -217,8 +217,8 @@ async def send_argument(request: ArgumentRequest):
         
         time_remaining = max(0, 300 - int(elapsed_time))
         
-        # Use actual judge reasoning instead of status update
-        judge_insight = f"🏛️ **Judge's Ruling:** {judge_result['reasoning']}"
+        # Generate status update
+        status_update = generate_status_update(bot.session.user_score, bot.session.bot_score, time_remaining)
         
         return ArgumentResponse(
             bot_response=bot_response,
@@ -228,7 +228,7 @@ async def send_argument(request: ArgumentRequest):
             time_remaining=time_remaining,
             game_ended=False,
             sources=sources,
-            status_update=judge_insight
+            status_update=status_update
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error processing argument: {str(e)}")

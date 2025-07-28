@@ -6,6 +6,11 @@ import os
 from datetime import datetime
 import requests
 import json
+import sys
+
+# Add the current directory to Python path
+sys.path.append(os.path.dirname(__file__))
+
 from argument_bot import SassyArgumentBot, ArgumentSession
 
 app = FastAPI(

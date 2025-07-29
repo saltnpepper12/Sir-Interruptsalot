@@ -576,95 +576,190 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
     return (
       <div className="min-h-screen bg-black text-white p-6">
         <div className="max-w-5xl mx-auto">
-          {/* Clean Header */}
-          <div className="text-center mb-10">
-            <h1 className="text-4xl font-bold text-yellow mb-4" style={{ color: '#ffcd1a' }}>
+          {/* Enhanced Header with Animation */}
+          <motion.div 
+            className="text-center mb-10"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <motion.h1 
+              className="text-4xl font-bold text-yellow mb-4" 
+              style={{ color: '#ffcd1a' }}
+              initial={{ scale: 0.9 }}
+              animate={{ scale: 1 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+            >
               🎭 Personality Roast Report 🎭
-            </h1>
-            <p className="text-lg text-white/80">
+            </motion.h1>
+            <motion.p 
+              className="text-lg text-white/80"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+            >
               Your argument session has ended. Here's what Sir Interruptsalot thinks about you:
-            </p>
-          </div>
+            </motion.p>
+          </motion.div>
 
-          {/* Simple Score Summary */}
-          <div className="bg-gray-800 rounded-lg p-6 mb-8 border border-gray-600">
+          {/* Enhanced Score Summary */}
+          <motion.div 
+            className="bg-gray-800 rounded-lg p-6 mb-8 border border-gray-600 shadow-lg"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5, delay: 0.6 }}
+            whileHover={{ scale: 1.02, boxShadow: "0 10px 25px rgba(255, 205, 26, 0.1)" }}
+          >
             <div className="flex justify-between items-center">
-              <div className="text-center">
+              <motion.div 
+                className="text-center"
+                whileHover={{ scale: 1.05 }}
+                transition={{ duration: 0.2 }}
+              >
                 <p className="text-sm text-white/60 mb-2">Your Score</p>
-                <p className="text-3xl font-bold text-green-400">{userScore}</p>
-              </div>
-              <div className="text-center">
+                <motion.p 
+                  className="text-3xl font-bold text-green-400"
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ duration: 0.5, delay: 0.8, type: "spring" }}
+                >
+                  {userScore}
+                </motion.p>
+              </motion.div>
+              <motion.div 
+                className="text-center"
+                whileHover={{ scale: 1.05 }}
+                transition={{ duration: 0.2 }}
+              >
                 <p className="text-sm text-white/60 mb-2">Sir Interruptsalot</p>
-                <p className="text-3xl font-bold text-red-400">{botScore}</p>
-              </div>
+                <motion.p 
+                  className="text-3xl font-bold text-red-400"
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ duration: 0.5, delay: 1.0, type: "spring" }}
+                >
+                  {botScore}
+                </motion.p>
+              </motion.div>
             </div>
-          </div>
+          </motion.div>
 
-          {/* Clean Report Cards */}
+          {/* Enhanced Report Cards */}
           <div className="grid gap-6 md:grid-cols-2">
             {reportSections.map((section, index) => (
-              <div key={section.id}>
+              <motion.div
+                key={section.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 1.2 + index * 0.1 }}
+                whileHover={{ y: -5 }}
+              >
                 <Card
-                  className="bg-gray-800 border border-gray-600 hover:border-yellow/50 transition-all cursor-pointer"
+                  className="bg-gray-800 border border-gray-600 hover:border-yellow/50 transition-all duration-300 cursor-pointer shadow-lg hover:shadow-xl hover:shadow-yellow/10 group"
                   onClick={() => toggleCard(section.id)}
                 >
                   <div className="p-6">
                     <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-lg font-semibold text-yellow" style={{ color: '#ffcd1a' }}>
+                      <motion.h3 
+                        className="text-lg font-semibold text-yellow group-hover:text-yellow-300 transition-colors" 
+                        style={{ color: '#ffcd1a' }}
+                        whileHover={{ scale: 1.02 }}
+                        transition={{ duration: 0.2 }}
+                      >
                         {section.title}
-                      </h3>
-                      <div className="text-white/60">
+                      </motion.h3>
+                      <motion.div 
+                        className="text-white/60"
+                        animate={{ 
+                          rotate: expandedCards.has(section.id) ? 90 : 0,
+                          scale: expandedCards.has(section.id) ? 1.1 : 1
+                        }}
+                        transition={{ duration: 0.3, type: "spring" }}
+                      >
                         {expandedCards.has(section.id) ? (
                           <ChevronDown className="w-5 h-5" />
                         ) : (
                           <ChevronRight className="w-5 h-5" />
                         )}
-                      </div>
+                      </motion.div>
                     </div>
                     
-                    <div
-                      className={`overflow-hidden transition-all duration-300 ${
-                        expandedCards.has(section.id) ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
-                      }`}
+                    <motion.div
+                      initial={false}
+                      animate={{
+                        height: expandedCards.has(section.id) ? 'auto' : 0,
+                        opacity: expandedCards.has(section.id) ? 1 : 0,
+                        y: expandedCards.has(section.id) ? 0 : -10
+                      }}
+                      transition={{ duration: 0.4, type: "spring", stiffness: 100 }}
+                      className="overflow-hidden"
                     >
                       <div className="text-white/90 whitespace-pre-line leading-relaxed space-y-2">
                         {section.content.split('\n').map((line, lineIndex) => (
-                          <div key={lineIndex} className="flex items-start">
+                          <motion.div 
+                            key={lineIndex} 
+                            className="flex items-start"
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 0.3, delay: lineIndex * 0.05 }}
+                          >
                             {line.startsWith('•') ? (
                               <>
-                                <span className="text-yellow mr-2 mt-1">•</span>
+                                <motion.span 
+                                  className="text-yellow mr-2 mt-1"
+                                  initial={{ scale: 0 }}
+                                  animate={{ scale: 1 }}
+                                  transition={{ duration: 0.2, delay: lineIndex * 0.05 }}
+                                >
+                                  •
+                                </motion.span>
                                 <span className="text-sm">{line.substring(1).trim()}</span>
                               </>
                             ) : (
                               <span className="text-sm">{line}</span>
                             )}
-                          </div>
+                          </motion.div>
                         ))}
                       </div>
-                    </div>
+                    </motion.div>
                     
-                    {/* Preview when collapsed */}
+                    {/* Enhanced preview when collapsed */}
                     {!expandedCards.has(section.id) && section.content && (
-                      <div className="text-white/60 text-sm italic">
+                      <motion.div 
+                        className="text-white/60 text-sm italic"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.3 }}
+                      >
                         "{section.content.split('\n')[0].replace(/^•\s*/, '')}..."
-                      </div>
+                      </motion.div>
                     )}
                   </div>
                 </Card>
-              </div>
+              </motion.div>
             ))}
           </div>
 
-          {/* Simple Back Button */}
-          <div className="text-center mt-10">
-            <Button
-              onClick={onBack}
-              className="bg-yellow hover:bg-yellow/90 text-black font-semibold px-8 py-3 rounded-lg"
-              style={{ backgroundColor: '#ffcd1a', color: '#000000' }}
+          {/* Enhanced Back Button */}
+          <motion.div 
+            className="text-center mt-10"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 1.8 }}
+          >
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
             >
-              Back to Start
-            </Button>
-          </div>
+              <Button
+                onClick={onBack}
+                className="bg-yellow hover:bg-yellow/90 text-black font-semibold px-8 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300"
+                style={{ backgroundColor: '#ffcd1a', color: '#000000' }}
+              >
+                Back to Start
+              </Button>
+            </motion.div>
+          </motion.div>
         </div>
       </div>
     );

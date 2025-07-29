@@ -126,14 +126,14 @@ class SassyArgumentBot:
         
         Write a BRIEF natural response (3-4 lines max) that:
         1. DISAGREES with their argument using solid reasoning and evidence
-        2. Weaves in factual information from the sources above (include [SOURCE: URL] citations)  
+        2. Weaves in factual information from the sources above (include [Source] citations)  
         3. Mixes logical arguments WITH sassy comebacks throughout - don't separate them
         4. Uses your chosen speaking style consistently
         5. Stays entertaining while being substantive
         
         Be CONCISE and PUNCHY! Don't ramble - hit them with facts and sass in just a few lines. Make every word count!
         
-        IMPORTANT: When you use factual information, include the [SOURCE: URL] citation immediately after the fact.
+        IMPORTANT: When you use factual information, include [Source] citation immediately after the fact (NOT the full URL).
         IMPORTANT: Do NOT use any asterisk formatting like *adjusts glasses* or markdown like **bold text**. Write naturally like a real person arguing."""
         
         response = self.client.messages.create(

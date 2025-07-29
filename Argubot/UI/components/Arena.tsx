@@ -592,58 +592,126 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
                     <motion.div 
                       key={index} 
                       className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.3 }}
+                      initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      transition={{ 
+                        duration: 0.4, 
+                        delay: index * 0.1,
+                        type: "spring",
+                        stiffness: 100,
+                        damping: 15
+                      }}
                     >
-                      <div className={`max-w-[85%] rounded-2xl p-4 shadow-lg ${
-                        message.role === 'user' 
-                          ? 'bg-blue-600/20 border border-blue-500/30' 
-                          : 'bg-gray-800/50 border border-gray-700/50'
-                      }`}>
+                      <motion.div 
+                        className={`max-w-[85%] rounded-2xl p-4 shadow-lg ${
+                          message.role === 'user' 
+                            ? 'bg-blue-600/20 border border-blue-500/30' 
+                            : 'bg-gray-800/50 border border-gray-700/50'
+                        }`}
+                        initial={{ scale: 0.8, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        transition={{ 
+                          duration: 0.3,
+                          delay: index * 0.1 + 0.1,
+                          type: "spring",
+                          stiffness: 200
+                        }}
+                      >
                         <div className="flex items-center space-x-2 mb-3">
-                          <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                            message.role === 'user' 
-                              ? 'bg-blue-500/20 text-blue-400' 
-                              : 'bg-yellow/20 text-yellow'
-                          }`} style={{ backgroundColor: message.role === 'user' ? 'rgba(59, 130, 246, 0.2)' : 'rgba(255, 205, 26, 0.2)', color: message.role === 'user' ? '#60a5fa' : '#ffcd1a' }}>
+                          <motion.div 
+                            className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                              message.role === 'user' 
+                                ? 'bg-blue-500/20 text-blue-400' 
+                                : 'bg-yellow/20 text-yellow'
+                            }`} 
+                            style={{ backgroundColor: message.role === 'user' ? 'rgba(59, 130, 246, 0.2)' : 'rgba(255, 205, 26, 0.2)', color: message.role === 'user' ? '#60a5fa' : '#ffcd1a' }}
+                            initial={{ scale: 0, rotate: -180 }}
+                            animate={{ scale: 1, rotate: 0 }}
+                            transition={{ duration: 0.4, delay: index * 0.1 + 0.2 }}
+                          >
                             {message.role === 'user' ? '👤' : '🤖'}
-                          </div>
-                          <span className="text-sm font-semibold text-white/80">
+                          </motion.div>
+                          <motion.span 
+                            className="text-sm font-semibold text-white/80"
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 0.3, delay: index * 0.1 + 0.3 }}
+                          >
                             {message.role === 'user' ? 'You' : 'Sir Interruptsalot'}
-                          </span>
-                          <span className="text-xs text-white/40">
+                          </motion.span>
+                          <motion.span 
+                            className="text-xs text-white/40"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ duration: 0.3, delay: index * 0.1 + 0.4 }}
+                          >
                             {new Date(message.timestamp).toLocaleTimeString()}
-                          </span>
+                          </motion.span>
                         </div>
                         
-                        <div className="text-white whitespace-pre-line leading-relaxed">
-                          {message.content}
-                        </div>
+                        <motion.div 
+                          className="text-white whitespace-pre-line leading-relaxed"
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          transition={{ duration: 0.5, delay: index * 0.1 + 0.5 }}
+                        >
+                          {message.role === 'bot' && message.sources && message.sources.length > 0 
+                            ? message.content.split('[Source]').map((part, index) => {
+                                if (index === 0) return part;
+                                const sourceIndex = index - 1;
+                                const source = message.sources?.[sourceIndex];
+                                return (
+                                  <span key={index}>
+                                    <a
+                                      href={source?.link}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="inline-flex items-center px-2 py-1 bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 text-xs rounded-full border border-blue-500/30 transition-all hover:scale-105 mx-1"
+                                    >
+                                      <ExternalLink className="w-3 h-3 mr-1" />
+                                      Source
+                                    </a>
+                                    {part}
+                                  </span>
+                                );
+                              }).join('')
+                            : message.content
+                          }
+                        </motion.div>
                         
                         {/* Sources for bot messages */}
                         {message.sources && message.sources.length > 0 && (
-                          <div className="mt-4 pt-3 border-t border-white/10">
+                          <motion.div 
+                            className="mt-4 pt-3 border-t border-white/10"
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.4, delay: index * 0.1 + 0.6 }}
+                          >
                             <p className="text-xs text-yellow mb-2 font-semibold" style={{ color: '#ffcd1a' }}>
                               📚 Sources Referenced:
                             </p>
                             <div className="flex flex-wrap gap-2">
                               {message.sources.map((source, idx) => (
-                                <a
+                                <motion.a
                                   key={idx}
                                   href={source.link}
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   className="inline-flex items-center px-3 py-1 bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 text-xs rounded-full border border-blue-500/30 transition-all hover:scale-105"
+                                  initial={{ opacity: 0, scale: 0.8 }}
+                                  animate={{ opacity: 1, scale: 1 }}
+                                  transition={{ duration: 0.3, delay: index * 0.1 + 0.7 + idx * 0.1 }}
+                                  whileHover={{ scale: 1.05 }}
+                                  whileTap={{ scale: 0.95 }}
                                 >
                                   <ExternalLink className="w-3 h-3 mr-1" />
                                   Source {idx + 1}
-                                </a>
+                                </motion.a>
                               ))}
                             </div>
-                          </div>
+                          </motion.div>
                         )}
-                      </div>
+                      </motion.div>
                     </motion.div>
                   ))
                 )}
@@ -651,19 +719,84 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
                 {isLoading && (
                   <motion.div 
                     className="flex justify-start"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3 }}
                   >
-                    <div className="bg-gray-800/50 border border-gray-700/50 rounded-2xl p-4 shadow-lg">
+                    <motion.div 
+                      className="bg-gray-800/50 border border-gray-700/50 rounded-2xl p-4 shadow-lg"
+                      initial={{ scale: 0.8, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ duration: 0.3, type: "spring", stiffness: 200 }}
+                    >
                       <div className="flex items-center space-x-3">
-                        <div className="flex space-x-1">
-                          <div className="w-2 h-2 bg-yellow rounded-full animate-bounce" style={{ backgroundColor: '#ffcd1a' }}></div>
-                          <div className="w-2 h-2 bg-yellow rounded-full animate-bounce" style={{ animationDelay: '0.1s', backgroundColor: '#ffcd1a' }}></div>
-                          <div className="w-2 h-2 bg-yellow rounded-full animate-bounce" style={{ animationDelay: '0.2s', backgroundColor: '#ffcd1a' }}></div>
+                        <motion.div 
+                          className="w-8 h-8 rounded-full flex items-center justify-center bg-yellow/20"
+                          style={{ backgroundColor: 'rgba(255, 205, 26, 0.2)' }}
+                          initial={{ scale: 0, rotate: -180 }}
+                          animate={{ scale: 1, rotate: 0 }}
+                          transition={{ duration: 0.4 }}
+                        >
+                          🤖
+                        </motion.div>
+                        <div className="flex items-center space-x-2">
+                          <motion.div 
+                            className="flex space-x-1"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.2 }}
+                          >
+                            <motion.div 
+                              className="w-2 h-2 bg-yellow rounded-full" 
+                              style={{ backgroundColor: '#ffcd1a' }}
+                              animate={{ 
+                                scale: [1, 1.2, 1],
+                                opacity: [0.5, 1, 0.5]
+                              }}
+                              transition={{ 
+                                duration: 1.4, 
+                                repeat: Infinity,
+                                delay: 0
+                              }}
+                            />
+                            <motion.div 
+                              className="w-2 h-2 bg-yellow rounded-full" 
+                              style={{ backgroundColor: '#ffcd1a' }}
+                              animate={{ 
+                                scale: [1, 1.2, 1],
+                                opacity: [0.5, 1, 0.5]
+                              }}
+                              transition={{ 
+                                duration: 1.4, 
+                                repeat: Infinity,
+                                delay: 0.2
+                              }}
+                            />
+                            <motion.div 
+                              className="w-2 h-2 bg-yellow rounded-full" 
+                              style={{ backgroundColor: '#ffcd1a' }}
+                              animate={{ 
+                                scale: [1, 1.2, 1],
+                                opacity: [0.5, 1, 0.5]
+                              }}
+                              transition={{ 
+                                duration: 1.4, 
+                                repeat: Infinity,
+                                delay: 0.4
+                              }}
+                            />
+                          </motion.div>
+                          <motion.span 
+                            className="text-sm text-white/60"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.3 }}
+                          >
+                            Sir Interruptsalot is typing...
+                          </motion.span>
                         </div>
-                        <span className="text-sm text-white/60">Sir Interruptsalot is thinking...</span>
                       </div>
-                    </div>
+                    </motion.div>
                   </motion.div>
                 )}
                 

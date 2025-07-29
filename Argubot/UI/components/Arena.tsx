@@ -56,7 +56,12 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
     "Cooking up some sass... 🌶️",
     "Preparing your personality roast... 🔥",
     "Generating your final verdict... ⚖️",
-    "Almost ready to serve... 🍽️"
+    "Almost ready to serve... 🍽️",
+    "Adding the perfect amount of spice... 🌶️",
+    "Crafting your character profile... 📝",
+    "Finalizing your roast report... 🎭",
+    "Adding finishing touches... ✨",
+    "Your personality roast is almost ready... 🎪"
   ];
 
   // Auto-scroll to bottom when messages update
@@ -331,90 +336,218 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
   // Loading screen during surrender
   if (isSurrendering && !gameEnded) {
     return (
-      <div className="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex items-center justify-center">
-        <div className="text-center space-y-6">
-          {/* Spinning pan */}
+      <div className="fixed inset-0 bg-black/95 backdrop-blur-md z-50 flex items-center justify-center">
+        <motion.div 
+          className="text-center space-y-8 max-w-md mx-auto p-8"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5 }}
+        >
+          {/* Main cooking container */}
           <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-            className="text-6xl"
+            className="relative"
+            animate={{ 
+              y: [0, -5, 0],
+              rotate: [0, 1, -1, 0]
+            }}
+            transition={{ 
+              duration: 3, 
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
           >
-            🍳
+            {/* Spinning pan with glow effect */}
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+              className="text-8xl drop-shadow-2xl"
+              style={{ filter: 'drop-shadow(0 0 20px rgba(255, 205, 26, 0.5))' }}
+            >
+              🍳
+            </motion.div>
+            
+            {/* Steam effects with better positioning */}
+            <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 flex justify-center space-x-3">
+              {[...Array(5)].map((_, i) => (
+                <motion.div
+                  key={i}
+                  animate={{ 
+                    y: [-5, -40], 
+                    opacity: [0.8, 0], 
+                    scale: [1, 1.8],
+                    x: [0, (i - 2) * 10]
+                  }}
+                  transition={{ 
+                    duration: 2.5, 
+                    repeat: Infinity, 
+                    delay: i * 0.2,
+                    ease: "easeOut"
+                  }}
+                  className="text-3xl"
+                >
+                  💨
+                </motion.div>
+              ))}
+            </div>
           </motion.div>
           
-          {/* Steam effects */}
-          <div className="flex justify-center space-x-2">
-            {[...Array(3)].map((_, i) => (
-              <motion.div
-                key={i}
-                animate={{ y: [-10, -30], opacity: [0.7, 0], scale: [1, 1.5] }}
-                transition={{ duration: 2, repeat: Infinity, delay: i * 0.3 }}
-                className="text-2xl"
-              >
-                💨
-              </motion.div>
-            ))}
-          </div>
-          
-          {/* Title */}
-          <motion.h2
-            animate={{ scale: [1, 1.05, 1] }}
-            transition={{ duration: 2, repeat: Infinity }}
-            className="text-3xl font-bold text-yellow"
-            style={{ color: '#ffcd1a' }}
-          >
-            Let him cook! 👨‍🍳
-          </motion.h2>
-          
-          {/* Dynamic message */}
-          <motion.p
-            key={cookingMessageIndex}
-            initial={{ opacity: 0, y: 10 }}
+          {/* Enhanced title with gradient text */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="text-lg text-white/80"
+            transition={{ duration: 0.8, delay: 0.3 }}
+            className="space-y-2"
           >
-            {cookingMessages[cookingMessageIndex]}
-          </motion.p>
+            <motion.h2
+              animate={{ 
+                scale: [1, 1.02, 1],
+                textShadow: [
+                  "0 0 10px rgba(255, 205, 26, 0.5)",
+                  "0 0 20px rgba(255, 205, 26, 0.8)",
+                  "0 0 10px rgba(255, 205, 26, 0.5)"
+                ]
+              }}
+              transition={{ duration: 2, repeat: Infinity }}
+              className="text-4xl font-bold bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-500 bg-clip-text text-transparent"
+              style={{ 
+                background: 'linear-gradient(45deg, #ffcd1a, #fbbf24, #ffcd1a)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent'
+              }}
+            >
+              Let Him Cook Now... 👨‍🍳
+            </motion.h2>
+            
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.8, delay: 0.5 }}
+              className="text-lg text-white/70 font-medium"
+            >
+              Crafting your personality roast with precision
+            </motion.p>
+          </motion.div>
           
-          {/* Bouncing dots */}
-          <div className="flex justify-center space-x-1">
+          {/* Enhanced dynamic message */}
+          <motion.div
+            className="min-h-[60px] flex items-center justify-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8, delay: 0.7 }}
+          >
+            <motion.p
+              key={cookingMessageIndex}
+              initial={{ opacity: 0, y: 10, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -10, scale: 0.9 }}
+              transition={{ duration: 0.5 }}
+              className="text-lg text-white/90 font-medium px-4 py-2 bg-yellow/10 rounded-lg border border-yellow/20"
+              style={{ backgroundColor: 'rgba(255, 205, 26, 0.1)', borderColor: 'rgba(255, 205, 26, 0.2)' }}
+            >
+              {cookingMessages[cookingMessageIndex]}
+            </motion.p>
+          </motion.div>
+          
+          {/* Enhanced bouncing dots */}
+          <motion.div 
+            className="flex justify-center space-x-2"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8, delay: 0.9 }}
+          >
             {[...Array(3)].map((_, i) => (
               <motion.div
                 key={i}
-                animate={{ y: [0, -10, 0] }}
-                transition={{ duration: 1, repeat: Infinity, delay: i * 0.2 }}
-                className="w-2 h-2 bg-yellow rounded-full"
+                animate={{ 
+                  y: [0, -15, 0],
+                  scale: [1, 1.2, 1],
+                  backgroundColor: ['#ffcd1a', '#fbbf24', '#ffcd1a']
+                }}
+                transition={{ 
+                  duration: 1.2, 
+                  repeat: Infinity, 
+                  delay: i * 0.2,
+                  ease: "easeInOut"
+                }}
+                className="w-3 h-3 rounded-full shadow-lg"
                 style={{ backgroundColor: '#ffcd1a' }}
               />
             ))}
-          </div>
+          </motion.div>
           
-          {/* Background sparkles */}
-          {[...Array(8)].map((_, i) => (
+          {/* Progress bar */}
+          <motion.div
+            className="w-full bg-gray-800 rounded-full h-2 overflow-hidden"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8, delay: 1.1 }}
+          >
+            <motion.div
+              className="h-full bg-gradient-to-r from-yellow-400 to-yellow-500 rounded-full"
+              initial={{ width: "0%" }}
+              animate={{ width: "100%" }}
+              transition={{ duration: 15, ease: "linear" }}
+              style={{ background: 'linear-gradient(90deg, #ffcd1a, #fbbf24)' }}
+            />
+          </motion.div>
+          
+          {/* Enhanced background sparkles */}
+          {[...Array(12)].map((_, i) => (
             <motion.div
               key={i}
-              className="absolute text-yellow/30"
+              className="absolute text-yellow/40 pointer-events-none"
               style={{
-                left: `${10 + Math.random() * 80}%`,
-                top: `${10 + Math.random() * 80}%`,
-                fontSize: `${Math.random() * 15 + 10}px`
+                left: `${5 + Math.random() * 90}%`,
+                top: `${5 + Math.random() * 90}%`,
+                fontSize: `${Math.random() * 20 + 12}px`
               }}
               animate={{
                 opacity: [0, 1, 0],
-                scale: [0.5, 1, 0.5],
-                rotate: [0, 180, 360]
+                scale: [0.3, 1.2, 0.3],
+                rotate: [0, 180, 360],
+                y: [0, -20, 0]
               }}
               transition={{
-                duration: 3,
+                duration: 4,
                 repeat: Infinity,
-                delay: Math.random() * 2
+                delay: Math.random() * 3,
+                ease: "easeInOut"
               }}
             >
               ✨
             </motion.div>
           ))}
-        </div>
+          
+          {/* Additional floating elements */}
+          <motion.div
+            className="absolute inset-0 pointer-events-none"
+            animate={{ rotate: 360 }}
+            transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+          >
+            {[...Array(6)].map((_, i) => (
+              <motion.div
+                key={i}
+                className="absolute text-yellow/20"
+                style={{
+                  left: `${10 + (i * 15)}%`,
+                  top: `${20 + (i * 10)}%`,
+                  fontSize: '16px'
+                }}
+                animate={{
+                  opacity: [0.2, 0.6, 0.2],
+                  scale: [0.8, 1.1, 0.8]
+                }}
+                transition={{
+                  duration: 3,
+                  repeat: Infinity,
+                  delay: i * 0.5
+                }}
+              >
+                🔥
+              </motion.div>
+            ))}
+          </motion.div>
+        </motion.div>
       </div>
     );
   }

@@ -216,9 +216,6 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
     if (!sessionId) return;
 
     try {
-      setIsSurrendering(false);
-      setCookingMessageIndex(0);
-      
       const response = await fetch(`${API_BASE_URL}/end_session`, {
         method: 'POST',
         headers: {
@@ -237,11 +234,17 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
       const data = await response.json();
       setFinalReport(data.final_report);
       setGameEnded(true);
+      
+      // Only set isSurrendering to false after we get the response
+      setIsSurrendering(false);
+      setCookingMessageIndex(0);
 
     } catch (error) {
       console.error('Error ending session:', error);
       // Fallback: just end the game
       setGameEnded(true);
+      setIsSurrendering(false);
+      setCookingMessageIndex(0);
     }
   };
 
@@ -335,7 +338,7 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
 
   // Loading screen during surrender
   if (isSurrendering && !gameEnded) {
-    return (
+  return (
       <div className="fixed inset-0 bg-black/95 backdrop-blur-md z-50 flex items-center justify-center">
         <motion.div 
           className="text-center space-y-8 max-w-md mx-auto p-8"
@@ -357,7 +360,7 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
             }}
           >
             {/* Spinning pan with glow effect */}
-            <motion.div
+          <motion.div 
               animate={{ rotate: 360 }}
               transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
               className="text-8xl drop-shadow-2xl"
@@ -389,12 +392,12 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
                 </motion.div>
               ))}
             </div>
-          </motion.div>
-          
+        </motion.div>
+
           {/* Enhanced title with gradient text */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.3 }}
             className="space-y-2"
           >
@@ -429,7 +432,7 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
           </motion.div>
           
           {/* Enhanced dynamic message */}
-          <motion.div
+            <motion.div
             className="min-h-[60px] flex items-center justify-center"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -476,7 +479,7 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
           </motion.div>
           
           {/* Progress bar */}
-          <motion.div
+                <motion.div
             className="w-full bg-gray-800 rounded-full h-2 overflow-hidden"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -489,7 +492,7 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
               transition={{ duration: 15, ease: "linear" }}
               style={{ background: 'linear-gradient(90deg, #ffcd1a, #fbbf24)' }}
             />
-          </motion.div>
+                </motion.div>
           
           {/* Enhanced background sparkles */}
           {[...Array(12)].map((_, i) => (
@@ -576,7 +579,7 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
                 <p className="text-sm text-white/60">Your Score</p>
                 <p className="text-2xl font-bold text-green-400">{userScore}</p>
               </div>
-              <div className="text-center">
+            <div className="text-center">
                 <p className="text-sm text-white/60">Sir Interruptsalot</p>
                 <p className="text-2xl font-bold text-red-400">{botScore}</p>
               </div>
@@ -605,7 +608,7 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
                       ) : (
                         <ChevronRight className="w-5 h-5 text-white/60" />
                       )}
-                    </motion.div>
+          </motion.div>
                   </div>
                   
                   <motion.div
@@ -702,7 +705,7 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
                 {isSurrendering ? "Cooking..." : surrenderHover ? "Please, Have Mercy! 😭" : "I Give Up! 🏳️"}
               </Button>
             )}
-          </div>
+                                </div>
         </motion.div>
 
         {/* Main Chat Area */}
@@ -772,17 +775,17 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
                           >
                             {message.role === 'user' ? 'You' : 'Sir Interruptsalot'}
                           </motion.span>
-                          <motion.span 
+                        <motion.span 
                             className="text-xs text-white/40"
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             transition={{ duration: 0.3, delay: index * 0.1 + 0.4 }}
                           >
                             {new Date(message.timestamp).toLocaleTimeString()}
-                          </motion.span>
-                        </div>
-                        
-                        <motion.div 
+                        </motion.span>
+                      </div>
+                      
+                            <motion.div
                           className="text-white whitespace-pre-line leading-relaxed"
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
@@ -806,8 +809,8 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
                                       <span key={partIndex}>
                                         <a
                                           href={source.link}
-                                          target="_blank"
-                                          rel="noopener noreferrer"
+                                target="_blank" 
+                                rel="noopener noreferrer"
                                           className="inline-flex items-center px-2 py-1 bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 text-xs rounded-full border border-blue-500/30 transition-all hover:scale-105 mx-1"
                                         >
                                           <ExternalLink className="w-3 h-3 mr-1" />
@@ -825,7 +828,7 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
                               })()
                             : message.content
                           }
-                        </motion.div>
+                            </motion.div>
                         
                         {/* Sources for bot messages */}
                         {message.sources && message.sources.length > 0 && (
@@ -973,13 +976,13 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
                   </Button>
                 </div>
               </div>
-            </Card>
+          </Card>
           </div>
 
           {/* Judge Insights Sidebar */}
           <div className="lg:col-span-1">
             {currentJudgeRuling && (
-              <motion.div
+          <motion.div 
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
@@ -994,8 +997,8 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
                   </div>
                   <p className="text-white/90 text-sm leading-relaxed">{currentJudgeRuling}</p>
                 </Card>
-              </motion.div>
-            )}
+          </motion.div>
+        )}
           </div>
         </div>
       </div>

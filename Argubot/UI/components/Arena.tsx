@@ -656,24 +656,31 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
                           transition={{ duration: 0.5, delay: index * 0.1 + 0.5 }}
                         >
                           {message.role === 'bot' && message.sources && message.sources.length > 0 
-                            ? message.content.split('[Source]').map((part, index) => {
-                                if (index === 0) return part;
-                                const sourceIndex = index - 1;
+                            ? message.content.split('[Source]').map((part, partIndex) => {
+                                if (partIndex === 0) return part;
+                                const sourceIndex = partIndex - 1;
                                 const source = message.sources?.[sourceIndex];
-                                return (
-                                  <span key={index}>
-                                    <a
-                                      href={source?.link}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="inline-flex items-center px-2 py-1 bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 text-xs rounded-full border border-blue-500/30 transition-all hover:scale-105 mx-1"
-                                    >
-                                      <ExternalLink className="w-3 h-3 mr-1" />
-                                      Source
-                                    </a>
-                                    {part}
-                                  </span>
-                                );
+                                
+                                // Only render source link if we have a valid source
+                                if (source && source.link) {
+                                  return (
+                                    <span key={partIndex}>
+                                      <a
+                                        href={source.link}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="inline-flex items-center px-2 py-1 bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 text-xs rounded-full border border-blue-500/30 transition-all hover:scale-105 mx-1"
+                                      >
+                                        <ExternalLink className="w-3 h-3 mr-1" />
+                                        Source
+                                      </a>
+                                      {part}
+                                    </span>
+                                  );
+                                } else {
+                                  // If no valid source, just return the text without a link
+                                  return <span key={partIndex}>{part}</span>;
+                                }
                               }).join('')
                             : message.content
                           }

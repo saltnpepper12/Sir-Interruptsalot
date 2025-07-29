@@ -574,259 +574,97 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
     const reportSections = parseReportSections(finalReport);
     
     return (
-      <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black text-white p-6 relative overflow-hidden">
-        {/* Background decorative elements */}
-        <div className="absolute inset-0 pointer-events-none">
-          {[...Array(20)].map((_, i) => (
-            <motion.div
-              key={i}
-              className="absolute text-yellow/5"
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                fontSize: `${Math.random() * 30 + 20}px`
-              }}
-              animate={{
-                opacity: [0.1, 0.3, 0.1],
-                scale: [0.8, 1.2, 0.8],
-                rotate: [0, 180, 360]
-              }}
-              transition={{
-                duration: 8,
-                repeat: Infinity,
-                delay: i * 0.4,
-                ease: "easeInOut"
-              }}
-            >
-              ⚔️
-            </motion.div>
-          ))}
-        </div>
-
-        <div className="max-w-6xl mx-auto relative z-10">
-          {/* Header with enhanced styling */}
-          <motion.div 
-            className="text-center mb-12"
-            initial={{ opacity: 0, y: -30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-          >
-            <motion.div
-              className="inline-flex items-center space-x-4 mb-6"
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ duration: 0.6, delay: 0.2, type: "spring" }}
-            >
-              <motion.div
-                animate={{ rotate: [0, 10, -10, 0] }}
-                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-                className="text-4xl"
-              >
-                🎭
-              </motion.div>
-              <h1 className="text-5xl font-bold bg-gradient-to-r from-yellow via-yellow-300 to-yellow bg-clip-text text-transparent">
-                Personality Roast Report
-              </h1>
-              <motion.div
-                animate={{ rotate: [0, -10, 10, 0] }}
-                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-                className="text-4xl"
-              >
-                🎭
-              </motion.div>
-            </motion.div>
-            
-            <motion.p 
-              className="text-xl text-white/80 font-light"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.8, delay: 0.4 }}
-            >
+      <div className="min-h-screen bg-black text-white p-6">
+        <div className="max-w-5xl mx-auto">
+          {/* Clean Header */}
+          <div className="text-center mb-10">
+            <h1 className="text-4xl font-bold text-yellow mb-4" style={{ color: '#ffcd1a' }}>
+              🎭 Personality Roast Report 🎭
+            </h1>
+            <p className="text-lg text-white/80">
               Your argument session has ended. Here's what Sir Interruptsalot thinks about you:
-            </motion.p>
-          </motion.div>
+            </p>
+          </div>
 
-          {/* Enhanced Score Summary */}
-          <motion.div 
-            className="mb-12"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6, delay: 0.6 }}
-          >
-            <div className="bg-gradient-to-r from-gray-900/80 to-gray-800/80 backdrop-blur-md rounded-2xl p-8 border border-yellow/20 shadow-2xl">
-              <div className="flex justify-between items-center">
-                <motion.div 
-                  className="text-center"
-                  whileHover={{ scale: 1.05 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <p className="text-sm text-white/60 mb-2 font-medium">Your Score</p>
-                  <motion.p 
-                    className="text-4xl font-bold text-green-400"
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ duration: 0.5, delay: 0.8, type: "spring" }}
-                  >
-                    {userScore}
-                  </motion.p>
-                </motion.div>
-                
-                <motion.div 
-                  className="text-center"
-                  whileHover={{ scale: 1.05 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <p className="text-sm text-white/60 mb-2 font-medium">Sir Interruptsalot</p>
-                  <motion.p 
-                    className="text-4xl font-bold text-red-400"
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ duration: 0.5, delay: 1.0, type: "spring" }}
-                  >
-                    {botScore}
-                  </motion.p>
-                </motion.div>
+          {/* Simple Score Summary */}
+          <div className="bg-gray-800 rounded-lg p-6 mb-8 border border-gray-600">
+            <div className="flex justify-between items-center">
+              <div className="text-center">
+                <p className="text-sm text-white/60 mb-2">Your Score</p>
+                <p className="text-3xl font-bold text-green-400">{userScore}</p>
+              </div>
+              <div className="text-center">
+                <p className="text-sm text-white/60 mb-2">Sir Interruptsalot</p>
+                <p className="text-3xl font-bold text-red-400">{botScore}</p>
               </div>
             </div>
-          </motion.div>
+          </div>
 
-          {/* Enhanced Report Cards */}
-          <div className="grid gap-8 md:grid-cols-2">
+          {/* Clean Report Cards */}
+          <div className="grid gap-6 md:grid-cols-2">
             {reportSections.map((section, index) => (
-              <motion.div
-                key={section.id}
-                initial={{ opacity: 0, y: 30, scale: 0.9 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                transition={{ 
-                  duration: 0.6, 
-                  delay: 1.2 + index * 0.1,
-                  type: "spring",
-                  stiffness: 100
-                }}
-                whileHover={{ y: -5 }}
-              >
+              <div key={section.id}>
                 <Card
-                  className="bg-gradient-to-br from-gray-900/90 to-gray-800/90 border-2 border-yellow/20 hover:border-yellow/40 transition-all duration-500 cursor-pointer backdrop-blur-md shadow-xl hover:shadow-2xl hover:shadow-yellow/20 group overflow-hidden"
-                  style={{ 
-                    backgroundColor: 'rgba(17, 17, 17, 0.9)',
-                    borderColor: 'rgba(255, 205, 26, 0.2)'
-                  }}
+                  className="bg-gray-800 border border-gray-600 hover:border-yellow/50 transition-all cursor-pointer"
                   onClick={() => toggleCard(section.id)}
                 >
-                  {/* Card header with enhanced styling */}
-                  <div className="p-8 relative">
-                    <div className="flex items-center justify-between mb-6">
-                      <motion.h3 
-                        className="text-2xl font-bold bg-gradient-to-r from-yellow to-yellow-300 bg-clip-text text-transparent group-hover:from-yellow-300 group-hover:to-yellow transition-all duration-300"
-                        whileHover={{ scale: 1.02 }}
-                        transition={{ duration: 0.2 }}
-                      >
+                  <div className="p-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-lg font-semibold text-yellow" style={{ color: '#ffcd1a' }}>
                         {section.title}
-                      </motion.h3>
-                      
-                      <motion.div
-                        animate={{ 
-                          rotate: expandedCards.has(section.id) ? 90 : 0,
-                          scale: expandedCards.has(section.id) ? 1.2 : 1
-                        }}
-                        transition={{ duration: 0.4, type: "spring", stiffness: 200 }}
-                        className="p-3 rounded-full bg-yellow/10 group-hover:bg-yellow/20 transition-all duration-300 border border-yellow/20"
-                        style={{ backgroundColor: 'rgba(255, 205, 26, 0.1)' }}
-                      >
+                      </h3>
+                      <div className="text-white/60">
                         {expandedCards.has(section.id) ? (
-                          <ChevronDown className="w-6 h-6 text-yellow" style={{ color: '#ffcd1a' }} />
+                          <ChevronDown className="w-5 h-5" />
                         ) : (
-                          <ChevronRight className="w-6 h-6 text-yellow" style={{ color: '#ffcd1a' }} />
+                          <ChevronRight className="w-5 h-5" />
                         )}
-                      </motion.div>
+                      </div>
                     </div>
                     
-                    {/* Enhanced content animation */}
-                    <motion.div
-                      initial={false}
-                      animate={{
-                        height: expandedCards.has(section.id) ? 'auto' : 0,
-                        opacity: expandedCards.has(section.id) ? 1 : 0,
-                        y: expandedCards.has(section.id) ? 0 : -20
-                      }}
-                      transition={{ 
-                        duration: 0.5, 
-                        type: "spring",
-                        stiffness: 80,
-                        damping: 20
-                      }}
-                      className="overflow-hidden"
+                    <div
+                      className={`overflow-hidden transition-all duration-300 ${
+                        expandedCards.has(section.id) ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+                      }`}
                     >
-                      <div className="text-white/95 whitespace-pre-line leading-relaxed space-y-3">
+                      <div className="text-white/90 whitespace-pre-line leading-relaxed space-y-2">
                         {section.content.split('\n').map((line, lineIndex) => (
-                          <motion.div
-                            key={lineIndex}
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ 
-                              duration: 0.4, 
-                              delay: lineIndex * 0.08 
-                            }}
-                            className="flex items-start space-x-2"
-                          >
+                          <div key={lineIndex} className="flex items-start">
                             {line.startsWith('•') ? (
                               <>
-                                <motion.span 
-                                  className="text-yellow mt-1"
-                                  initial={{ scale: 0 }}
-                                  animate={{ scale: 1 }}
-                                  transition={{ duration: 0.3, delay: lineIndex * 0.08 }}
-                                >
-                                  •
-                                </motion.span>
-                                <span className="text-sm leading-relaxed">{line.substring(1).trim()}</span>
+                                <span className="text-yellow mr-2 mt-1">•</span>
+                                <span className="text-sm">{line.substring(1).trim()}</span>
                               </>
                             ) : (
-                              <span className="text-sm leading-relaxed">{line}</span>
+                              <span className="text-sm">{line}</span>
                             )}
-                          </motion.div>
+                          </div>
                         ))}
                       </div>
-                    </motion.div>
+                    </div>
                     
-                    {/* Enhanced preview text when collapsed */}
+                    {/* Preview when collapsed */}
                     {!expandedCards.has(section.id) && section.content && (
-                      <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        className="mt-4 p-4 bg-yellow/5 rounded-lg border border-yellow/10"
-                        style={{ backgroundColor: 'rgba(255, 205, 26, 0.05)' }}
-                      >
-                        <p className="text-white/70 text-sm italic">
-                          "{section.content.split('\n')[0].replace(/^•\s*/, '')}..."
-                        </p>
-                        <p className="text-yellow/60 text-xs mt-2">Click to expand</p>
-                      </motion.div>
+                      <div className="text-white/60 text-sm italic">
+                        "{section.content.split('\n')[0].replace(/^•\s*/, '')}..."
+                      </div>
                     )}
                   </div>
                 </Card>
-              </motion.div>
+              </div>
             ))}
           </div>
 
-          {/* Enhanced Back Button */}
-          <motion.div 
-            className="text-center mt-16"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 1.8 }}
-          >
+          {/* Simple Back Button */}
+          <div className="text-center mt-10">
             <Button
               onClick={onBack}
-              className="bg-gradient-to-r from-yellow to-yellow-400 hover:from-yellow-400 hover:to-yellow text-black font-bold px-12 py-4 text-lg rounded-xl shadow-2xl hover:shadow-yellow/30 transition-all duration-300 transform hover:scale-105"
-              style={{ 
-                background: 'linear-gradient(135deg, #ffcd1a 0%, #ffd700 100%)',
-                color: '#000000'
-              }}
+              className="bg-yellow hover:bg-yellow/90 text-black font-semibold px-8 py-3 rounded-lg"
+              style={{ backgroundColor: '#ffcd1a', color: '#000000' }}
             >
               Back to Start
             </Button>
-          </motion.div>
+          </div>
         </div>
       </div>
     );

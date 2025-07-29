@@ -3,7 +3,7 @@ import { Card } from "./ui/card";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Badge } from "./ui/badge";
-import { ArrowLeft, Clock, Send, Trophy, ExternalLink, Flag, ChevronDown, ChevronRight } from "lucide-react";
+import { ArrowLeft, Clock, Send, Trophy, ExternalLink, Flag, ChevronDown, ChevronRight, Swords, MessageCircle } from "lucide-react";
 import { motion } from "framer-motion";
 
 // API Configuration
@@ -509,40 +509,48 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white p-4" style={{ backgroundColor: '#000000' }}>
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen bg-black text-white relative" style={{ backgroundColor: '#000000', color: '#ffffff' }}>
+      <div className="container mx-auto px-4 py-6">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
+        <motion.div 
+          className="flex items-center justify-between mb-8"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
           <div className="flex items-center space-x-4">
             <Button
               onClick={onBack}
               variant="ghost"
-              className="text-white hover:bg-white/10"
+              className="text-white hover:bg-white/10 transition-all"
             >
               <ArrowLeft className="w-5 h-5 mr-2" />
               Back to Start
             </Button>
-            <Badge className="bg-yellow text-black font-semibold" style={{ backgroundColor: '#ffcd1a', color: '#000000' }}>
-              {roomName}
-            </Badge>
+            <div className="flex items-center space-x-2">
+              <Swords className="w-5 h-5 text-yellow" style={{ color: '#ffcd1a' }} />
+              <Badge className="bg-yellow/20 text-yellow border border-yellow/30 font-semibold" style={{ backgroundColor: 'rgba(255, 205, 26, 0.2)', color: '#ffcd1a', borderColor: 'rgba(255, 205, 26, 0.3)' }}>
+                {roomName}
+              </Badge>
+            </div>
           </div>
           
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-6">
             {/* Timer */}
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-2 bg-gray-900/50 px-4 py-2 rounded-lg border border-gray-700">
               <Clock className="w-5 h-5 text-yellow" style={{ color: '#ffcd1a' }} />
-              <span className="font-mono text-lg">{formatTime(timeRemaining)}</span>
+              <span className="font-mono text-lg font-bold">{formatTime(timeRemaining)}</span>
             </div>
             
             {/* Scores */}
             {gameStarted && (
-              <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-6 bg-gray-900/50 px-4 py-2 rounded-lg border border-gray-700">
                 <div className="text-center">
-                  <p className="text-sm text-white/60">You</p>
+                  <p className="text-xs text-white/60">You</p>
                   <p className="text-xl font-bold text-green-400">{userScore}</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-sm text-white/60">Sir Interruptsalot</p>
+                  <p className="text-xs text-white/60">Sir Interruptsalot</p>
                   <p className="text-xl font-bold text-red-400">{botScore}</p>
                 </div>
               </div>
@@ -555,121 +563,160 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
                 disabled={isSurrendering}
                 onMouseEnter={() => setSurrenderHover(true)}
                 onMouseLeave={() => setSurrenderHover(false)}
-                className="bg-red-600 hover:bg-red-700 text-white font-semibold px-4 py-2 transition-all"
+                className="bg-red-600/20 hover:bg-red-600/30 text-red-400 border border-red-500/30 font-semibold px-4 py-2 transition-all"
                 title={isSurrendering ? "Cooking..." : "End the argument and get your personality report"}
               >
                 {isSurrendering ? "Cooking..." : surrenderHover ? "Please, Have Mercy! 😭" : "I Give Up! 🏳️"}
               </Button>
             )}
           </div>
-        </div>
+        </motion.div>
 
-        {/* Chat Area */}
-        <Card className="bg-gray-900 border-gray-700 min-h-[80vh] flex flex-col">
-          <div className="flex-1 overflow-y-auto p-6 space-y-4 max-h-[70vh]">
-            {messages.length === 0 && !isLoading ? (
-              <div className="text-center text-white/60 py-8">
-                <p>Waiting for Sir Interruptsalot to respond...</p>
-              </div>
-            ) : (
-              messages.map((message, index) => (
-                <div key={index} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`max-w-[80%] ${message.role === 'user' ? 'bg-blue-600' : 'bg-gray-700'} rounded-lg p-3`}>
-                    <div className="flex items-center space-x-2 mb-2">
-                      <span className="text-xs text-white/60">
-                        {message.role === 'user' ? 'You' : 'Sir Interruptsalot'}
-                      </span>
-                      <span className="text-xs text-white/40">
-                        {new Date(message.timestamp).toLocaleTimeString()}
-                      </span>
+        {/* Main Chat Area */}
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          {/* Chat Section */}
+          <div className="lg:col-span-3">
+            <Card className="bg-gray-900/50 border-2 border-yellow/30 backdrop-blur-sm shadow-2xl shadow-yellow/10 min-h-[75vh] flex flex-col" style={{ backgroundColor: 'rgba(17, 17, 17, 0.5)', borderColor: 'rgba(255, 205, 26, 0.3)' }}>
+              {/* Messages Area */}
+              <div className="flex-1 overflow-y-auto p-6 space-y-4 max-h-[65vh]">
+                {messages.length === 0 && !isLoading ? (
+                  <div className="text-center text-white/60 py-12">
+                    <div className="w-16 h-16 bg-yellow/10 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: 'rgba(255, 205, 26, 0.1)' }}>
+                      <MessageCircle className="w-8 h-8 text-yellow" style={{ color: '#ffcd1a' }} />
                     </div>
-                    
-                    <div className="text-white whitespace-pre-line">
-                      {message.content}
-                    </div>
-                    
-                    {/* Sources for bot messages */}
-                    {message.sources && message.sources.length > 0 && (
-                      <div className="mt-3 pt-3 border-t border-white/20">
-                        <p className="text-xs text-yellow mb-2" style={{ color: '#ffcd1a' }}>
-                          📚 Sources Referenced:
-                        </p>
-                        <div className="space-y-1">
-                          {message.sources.map((source, idx) => (
-                            <a
-                              key={idx}
-                              href={source.link}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="block text-xs text-blue-400 hover:text-blue-300 transition-colors"
-                            >
-                              • {source.title || source.snippet.substring(0, 50)}...
-                            </a>
-                          ))}
+                    <p className="text-lg">Waiting for Sir Interruptsalot to respond...</p>
+                    <p className="text-sm text-white/40 mt-2">The debate is about to begin!</p>
+                  </div>
+                ) : (
+                  messages.map((message, index) => (
+                    <motion.div 
+                      key={index} 
+                      className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <div className={`max-w-[85%] rounded-2xl p-4 shadow-lg ${
+                        message.role === 'user' 
+                          ? 'bg-blue-600/20 border border-blue-500/30' 
+                          : 'bg-gray-800/50 border border-gray-700/50'
+                      }`}>
+                        <div className="flex items-center space-x-2 mb-3">
+                          <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                            message.role === 'user' 
+                              ? 'bg-blue-500/20 text-blue-400' 
+                              : 'bg-yellow/20 text-yellow'
+                          }`} style={{ backgroundColor: message.role === 'user' ? 'rgba(59, 130, 246, 0.2)' : 'rgba(255, 205, 26, 0.2)', color: message.role === 'user' ? '#60a5fa' : '#ffcd1a' }}>
+                            {message.role === 'user' ? '👤' : '🤖'}
+                          </div>
+                          <span className="text-sm font-semibold text-white/80">
+                            {message.role === 'user' ? 'You' : 'Sir Interruptsalot'}
+                          </span>
+                          <span className="text-xs text-white/40">
+                            {new Date(message.timestamp).toLocaleTimeString()}
+                          </span>
                         </div>
+                        
+                        <div className="text-white whitespace-pre-line leading-relaxed">
+                          {message.content}
+                        </div>
+                        
+                        {/* Sources for bot messages */}
+                        {message.sources && message.sources.length > 0 && (
+                          <div className="mt-4 pt-3 border-t border-white/10">
+                            <p className="text-xs text-yellow mb-2 font-semibold" style={{ color: '#ffcd1a' }}>
+                              📚 Sources Referenced:
+                            </p>
+                            <div className="flex flex-wrap gap-2">
+                              {message.sources.map((source, idx) => (
+                                <a
+                                  key={idx}
+                                  href={source.link}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center px-3 py-1 bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 text-xs rounded-full border border-blue-500/30 transition-all hover:scale-105"
+                                >
+                                  <ExternalLink className="w-3 h-3 mr-1" />
+                                  Source {idx + 1}
+                                </a>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                       </div>
-                    )}
-                  </div>
-                </div>
-              ))
-            )}
-            
-            {isLoading && (
-              <div className="flex justify-start">
-                <div className="bg-gray-700 rounded-lg p-3">
-                  <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-yellow rounded-full animate-pulse" style={{ backgroundColor: '#ffcd1a' }}></div>
-                    <div className="w-2 h-2 bg-yellow rounded-full animate-pulse" style={{ backgroundColor: '#ffcd1a' }}></div>
-                    <div className="w-2 h-2 bg-yellow rounded-full animate-pulse" style={{ backgroundColor: '#ffcd1a' }}></div>
-                  </div>
+                    </motion.div>
+                  ))
+                )}
+                
+                {isLoading && (
+                  <motion.div 
+                    className="flex justify-start"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                  >
+                    <div className="bg-gray-800/50 border border-gray-700/50 rounded-2xl p-4 shadow-lg">
+                      <div className="flex items-center space-x-3">
+                        <div className="flex space-x-1">
+                          <div className="w-2 h-2 bg-yellow rounded-full animate-bounce" style={{ backgroundColor: '#ffcd1a' }}></div>
+                          <div className="w-2 h-2 bg-yellow rounded-full animate-bounce" style={{ animationDelay: '0.1s', backgroundColor: '#ffcd1a' }}></div>
+                          <div className="w-2 h-2 bg-yellow rounded-full animate-bounce" style={{ animationDelay: '0.2s', backgroundColor: '#ffcd1a' }}></div>
+                        </div>
+                        <span className="text-sm text-white/60">Sir Interruptsalot is thinking...</span>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+                
+                <div ref={messagesEndRef} />
+              </div>
+
+              {/* Input Area */}
+              <div className="border-t border-gray-700/50 p-4 bg-gray-900/30">
+                <div className="flex space-x-3">
+                  <Input
+                    value={userInput}
+                    onChange={(e) => setUserInput(e.target.value)}
+                    onKeyPress={handleKeyPress}
+                    placeholder="Type your argument here..."
+                    disabled={isLoading || gameEnded}
+                    className="flex-1 bg-gray-800/50 border-gray-600/50 text-white placeholder-white/50 rounded-xl focus:ring-2 focus:ring-yellow focus:border-yellow transition-all"
+                    style={{ backgroundColor: 'rgba(31, 41, 55, 0.5)', borderColor: 'rgba(75, 85, 99, 0.5)' }}
+                  />
+                  <Button
+                    onClick={handleSubmitArgument}
+                    disabled={!userInput.trim() || isLoading || gameEnded}
+                    className="bg-yellow hover:bg-yellow/90 text-black font-semibold px-6 rounded-xl transition-all transform hover:scale-105 disabled:transform-none"
+                    style={{ backgroundColor: '#ffcd1a', color: '#000000' }}
+                  >
+                    <Send className="w-4 h-4" />
+                  </Button>
                 </div>
               </div>
-            )}
-            
-            <div ref={messagesEndRef} />
+            </Card>
           </div>
 
-          {/* Input Area */}
-          <div className="border-t border-gray-700 p-4">
-            <div className="flex space-x-2">
-              <Input
-                value={userInput}
-                onChange={(e) => setUserInput(e.target.value)}
-                onKeyPress={handleKeyPress}
-                placeholder="Type your argument here..."
-                disabled={isLoading || gameEnded}
-                className="flex-1 bg-gray-800 border-gray-600 text-white placeholder-white/50"
-              />
-              <Button
-                onClick={handleSubmitArgument}
-                disabled={!userInput.trim() || isLoading || gameEnded}
-                className="bg-yellow hover:bg-yellow/90 text-black font-semibold"
-                style={{ backgroundColor: '#ffcd1a', color: '#000000' }}
+          {/* Judge Insights Sidebar */}
+          <div className="lg:col-span-1">
+            {currentJudgeRuling && (
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                className="sticky top-6"
               >
-                <Send className="w-4 h-4" />
-              </Button>
-            </div>
+                <Card className="p-4 bg-yellow/5 border-2 border-yellow/30 backdrop-blur-sm shadow-lg" style={{ backgroundColor: 'rgba(255, 205, 26, 0.05)', borderColor: 'rgba(255, 205, 26, 0.3)' }}>
+                  <div className="flex items-center space-x-2 mb-3">
+                    <Trophy className="w-5 h-5 text-yellow" style={{ color: '#ffcd1a' }} />
+                    <span className="font-semibold text-yellow" style={{ color: '#ffcd1a' }}>
+                      Judge's Insights
+                    </span>
+                  </div>
+                  <p className="text-white/90 text-sm leading-relaxed">{currentJudgeRuling}</p>
+                </Card>
+              </motion.div>
+            )}
           </div>
-        </Card>
-
-        {/* Judge Ruling Box */}
-        {currentJudgeRuling && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="mt-4 p-4 bg-yellow/10 border border-yellow/30 rounded-lg"
-            style={{ backgroundColor: 'rgba(255, 205, 26, 0.1)', borderColor: 'rgba(255, 205, 26, 0.3)' }}
-          >
-            <div className="flex items-center space-x-2 mb-2">
-              <Trophy className="w-5 h-5 text-yellow" style={{ color: '#ffcd1a' }} />
-              <span className="font-semibold text-yellow" style={{ color: '#ffcd1a' }}>
-                Judge's Ruling
-              </span>
-            </div>
-            <p className="text-white/90">{currentJudgeRuling}</p>
-          </motion.div>
-        )}
+        </div>
       </div>
     </div>
   );

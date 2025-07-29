@@ -255,7 +255,7 @@ async def start_session(request: ArgumentRequest):
                 })
         
         # Generate initial status update
-        status_update = generate_status_update(bot.session.user_score, bot.session.bot_score, 300)
+        status_update = None  # No judge insights on first message
         
         response = ArgumentResponse(
             bot_response=bot_response,
@@ -324,8 +324,8 @@ async def send_argument(request: ArgumentRequest):
         
         time_remaining = max(0, 300 - int(elapsed_time))
         
-        # Generate status update
-        status_update = generate_status_update(bot.session.user_score, bot.session.bot_score, time_remaining)
+        # Use the actual judge reasoning instead of generic status update
+        judge_insight = judge_result.get("reasoning", "Judge was unable to provide reasoning for this round.")
         
         return ArgumentResponse(
             bot_response=bot_response,
@@ -335,7 +335,7 @@ async def send_argument(request: ArgumentRequest):
             time_remaining=time_remaining,
             game_ended=False,
             sources=sources,
-            status_update=status_update
+            status_update=judge_insight
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error processing argument: {str(e)}")

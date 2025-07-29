@@ -286,13 +286,15 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
 
   const toggleCard = (cardId: string) => {
     setExpandedCards(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(cardId)) {
-        newSet.delete(cardId);
+      const newSet = new Set<string>();
+      if (prev.has(cardId)) {
+        // If clicking the same card, close it
+        return newSet;
       } else {
+        // If clicking a different card, close all others and open this one
         newSet.add(cardId);
+        return newSet;
       }
-      return newSet;
     });
   };
 
@@ -303,6 +305,7 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
     let currentContent: string[] = [];
 
     for (const line of lines) {
+      // Check for section headers with better pattern matching
       if (line.includes('👤 Arguing Persona:') || 
           line.includes('🔍 ARGUING STYLE BREAKDOWN:') ||
           line.includes('💪 STRONGEST TRAITS:') ||
@@ -317,13 +320,23 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
           sections.push(currentSection);
         }
 
-        // Start new section
-        const title = line.replace(/^[^:]*:\s*/, '').trim();
+        // Start new section with better title extraction
+        let title = line.trim();
+        if (title.includes(':')) {
+          title = title.split(':')[1]?.trim() || title;
+        }
+        
+        // Clean up the title
+        title = title.replace(/^[^a-zA-Z]*/, '').trim();
+        
         const id = title.toLowerCase().replace(/[^a-z0-9]/g, '-');
         currentSection = { id, title, content: '' };
         currentContent = [];
       } else if (currentSection && line.trim()) {
-        currentContent.push(line);
+        // Only add non-empty lines to content
+        if (line.trim() && !line.startsWith('🎭') && !line.startsWith('---')) {
+          currentContent.push(line.trim());
+        }
       }
     }
 
@@ -333,7 +346,8 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
       sections.push(currentSection);
     }
 
-    return sections;
+    // Filter out sections with no content
+    return sections.filter(section => section.content.length > 0);
   };
 
   // Loading screen during surrender
@@ -587,45 +601,92 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
           </div>
 
           {/* Report Cards */}
-          <div className="grid gap-4 md:grid-cols-2">
-            {reportSections.map((section) => (
-              <Card
+          <div className="grid gap-6 md:grid-cols-2">
+            {reportSections.map((section, index) => (
+              <motion.div
                 key={section.id}
-                className="bg-gray-900 border-gray-700 hover:border-yellow/50 transition-all cursor-pointer"
-                onClick={() => toggleCard(section.id)}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
               >
-                <div className="p-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-lg font-semibold text-yellow" style={{ color: '#ffcd1a' }}>
-                      {section.title}
-                    </h3>
-                    <motion.div
-                      animate={{ rotate: expandedCards.has(section.id) ? 90 : 0 }}
-                      transition={{ duration: 0.2 }}
-                    >
-                      {expandedCards.has(section.id) ? (
-                        <ChevronDown className="w-5 h-5 text-white/60" />
-                      ) : (
-                        <ChevronRight className="w-5 h-5 text-white/60" />
-                      )}
-          </motion.div>
-                  </div>
-                  
-                  <motion.div
-                    initial={false}
-                    animate={{
-                      height: expandedCards.has(section.id) ? 'auto' : 0,
-                      opacity: expandedCards.has(section.id) ? 1 : 0
-                    }}
-                    transition={{ duration: 0.3 }}
-                    className="overflow-hidden"
-                  >
-                    <div className="text-white/80 whitespace-pre-line">
-                      {section.content}
+                <Card
+                  className="bg-gray-900/50 border-2 border-gray-700/50 hover:border-yellow/50 transition-all duration-300 cursor-pointer backdrop-blur-sm shadow-lg hover:shadow-yellow/10 group"
+                  style={{ backgroundColor: 'rgba(17, 17, 17, 0.5)', borderColor: 'rgba(75, 85, 99, 0.5)' }}
+                  onClick={() => toggleCard(section.id)}
+                >
+                  <div className="p-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <motion.h3 
+                        className="text-xl font-bold text-yellow group-hover:text-yellow-300 transition-colors"
+                        style={{ color: '#ffcd1a' }}
+                        whileHover={{ scale: 1.02 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        {section.title}
+                      </motion.h3>
+                      <motion.div
+                        animate={{ 
+                          rotate: expandedCards.has(section.id) ? 90 : 0,
+                          scale: expandedCards.has(section.id) ? 1.1 : 1
+                        }}
+                        transition={{ duration: 0.3, type: "spring", stiffness: 200 }}
+                        className="p-2 rounded-full bg-yellow/10 group-hover:bg-yellow/20 transition-colors"
+                        style={{ backgroundColor: 'rgba(255, 205, 26, 0.1)' }}
+                      >
+                        {expandedCards.has(section.id) ? (
+                          <ChevronDown className="w-5 h-5 text-yellow" style={{ color: '#ffcd1a' }} />
+                        ) : (
+                          <ChevronRight className="w-5 h-5 text-yellow" style={{ color: '#ffcd1a' }} />
+                        )}
+                      </motion.div>
                     </div>
-                  </motion.div>
-                </div>
-              </Card>
+                    
+                    <motion.div
+                      initial={false}
+                      animate={{
+                        height: expandedCards.has(section.id) ? 'auto' : 0,
+                        opacity: expandedCards.has(section.id) ? 1 : 0,
+                        y: expandedCards.has(section.id) ? 0 : -10
+                      }}
+                      transition={{ 
+                        duration: 0.4, 
+                        type: "spring",
+                        stiffness: 100,
+                        damping: 15
+                      }}
+                      className="overflow-hidden"
+                    >
+                      <div className="text-white/90 whitespace-pre-line leading-relaxed space-y-2">
+                        {section.content.split('\n').map((line, lineIndex) => (
+                          <motion.p
+                            key={lineIndex}
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ 
+                              duration: 0.3, 
+                              delay: lineIndex * 0.05 
+                            }}
+                            className="text-sm"
+                          >
+                            {line}
+                          </motion.p>
+                        ))}
+                      </div>
+                    </motion.div>
+                    
+                    {/* Preview text when collapsed */}
+                    {!expandedCards.has(section.id) && section.content && (
+                      <motion.p
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="text-white/60 text-sm italic truncate"
+                      >
+                        {section.content.split('\n')[0]}...
+                      </motion.p>
+                    )}
+                  </div>
+                </Card>
+              </motion.div>
             ))}
           </div>
 

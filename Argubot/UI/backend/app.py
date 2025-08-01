@@ -286,9 +286,12 @@ async def send_argument(request: ArgumentRequest):
         
         # Check if time is up
         elapsed_time = (datetime.now() - bot.session.start_time).total_seconds()
+        print(f"DEBUG: elapsed_time={elapsed_time}, is_final_message={request.is_final_message}")
+        
         if elapsed_time >= 300:  # 5 minutes
             # If this is marked as a final message, allow it to proceed
             if not request.is_final_message:
+                print("DEBUG: Time up, not final message - ending session")
                 bot.session.is_active = False
                 return ArgumentResponse(
                     bot_response="⏰ Time's up! The argument session has ended.",
@@ -299,6 +302,8 @@ async def send_argument(request: ArgumentRequest):
                     game_ended=True,
                     sources=[]
                 )
+            else:
+                print("DEBUG: Time up, but this is final message - processing normally")
         
         # Get facts for the argument
         facts = await search_facts(request.message)

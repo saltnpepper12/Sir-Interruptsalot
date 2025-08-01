@@ -183,6 +183,8 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
       };
       setMessages(prev => [...prev, userMessage]);
 
+      console.log(`DEBUG Frontend: Sending message, allowFinalMessage=${allowFinalMessage}, timeRemaining=${timeRemaining}`);
+      
       const response = await fetch(`${API_BASE_URL}/send_argument`, {
         method: 'POST',
         headers: {

@@ -76,17 +76,17 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
       const isNearBottom = container.scrollTop > (container.scrollHeight - container.clientHeight - 100);
       const isMobile = window.innerWidth < 1024; // lg breakpoint
       
-      // Only auto-scroll if:
-      // 1. User is near the bottom (actively following conversation)
-      // 2. OR it's a new message and not mobile (desktop users expect auto-scroll)
-      if (isNearBottom || (!isMobile && hasNewMessage)) {
-        // Delay scroll on mobile to let users read their message first
-        const scrollDelay = isMobile ? 2000 : 500;
+      // Enhanced auto-scroll logic:
+      // 1. On mobile: Always scroll to new messages (users expect to see responses)
+      // 2. On desktop: Only scroll if near bottom (less intrusive)
+      if (isMobile || isNearBottom) {
+        // Reduced delay on mobile for better responsiveness
+        const scrollDelay = isMobile ? 800 : 300;
         
         setTimeout(() => {
           messagesEndRef.current?.scrollIntoView({ 
             behavior: 'smooth',
-            block: 'nearest' // Less aggressive scrolling
+            block: 'end' // Scroll fully to new message on mobile
           });
         }, scrollDelay);
       }
@@ -939,9 +939,10 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
             </div>
           </div>
           
-          <div className="flex items-center space-x-6">
-            {/* Timer */}
-            <div className={`flex items-center space-x-2 px-4 py-2 rounded-lg border ${
+          {/* Mobile-first responsive layout */}
+          <div className="flex flex-col lg:flex-row lg:items-center gap-4 lg:gap-6">
+            {/* Timer - always visible on top for mobile */}
+            <div className={`flex items-center justify-center lg:justify-start space-x-2 px-4 py-2 rounded-lg border ${
               isOvertime 
                 ? 'bg-red-900/50 border-red-700 animate-pulse' 
                 : 'bg-gray-900/50 border-gray-700'
@@ -952,34 +953,37 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
               </span>
             </div>
             
-            {/* Scores */}
-            {gameStarted && (
-              <div className="flex items-center space-x-6 bg-gray-900/50 px-4 py-2 rounded-lg border border-gray-700">
-                <div className="text-center">
-                  <p className="text-xs text-white/60">You</p>
-                  <p className="text-xl font-bold text-green-400">{userScore}</p>
+            {/* Scores and Give Up Button - flex row on mobile, aligned properly */}
+            <div className="flex items-center justify-between lg:justify-start gap-3 lg:gap-6">
+              {/* Scores */}
+              {gameStarted && (
+                <div className="flex items-center space-x-3 lg:space-x-6 bg-gray-900/50 px-3 lg:px-4 py-2 rounded-lg border border-gray-700">
+                  <div className="text-center">
+                    <p className="text-xs text-white/60">You</p>
+                    <p className="text-lg lg:text-xl font-bold text-green-400">{userScore}</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-xs text-white/60">Bot</p>
+                    <p className="text-lg lg:text-xl font-bold text-red-400">{botScore}</p>
+                  </div>
                 </div>
-                <div className="text-center">
-                  <p className="text-xs text-white/60">Sir Interruptsalot</p>
-                  <p className="text-xl font-bold text-red-400">{botScore}</p>
-                </div>
-              </div>
-            )}
-            
-            {/* Surrender Button */}
-            {gameStarted && !gameEnded && (
-              <Button
-                onClick={handleSurrender}
-                disabled={isSurrendering || isOvertime}
-                onMouseEnter={() => setSurrenderHover(true)}
-                onMouseLeave={() => setSurrenderHover(false)}
-                className="bg-red-600/20 hover:bg-red-600/30 text-red-400 border border-red-500/30 font-semibold px-4 py-2 transition-all"
-                title={isSurrendering ? "Cooking..." : isOvertime ? "No surrendering in overtime - submit your final message!" : "End the argument and get your personality report"}
-              >
-                {isSurrendering ? "Cooking..." : surrenderHover ? "Please, Have Mercy! 😭" : "I Give Up! 🏳️"}
-              </Button>
-            )}
-                                </div>
+              )}
+              
+              {/* Surrender Button */}
+              {gameStarted && !gameEnded && (
+                <Button
+                  onClick={handleSurrender}
+                  disabled={isSurrendering || isOvertime}
+                  onMouseEnter={() => setSurrenderHover(true)}
+                  onMouseLeave={() => setSurrenderHover(false)}
+                  className="bg-red-600/20 hover:bg-red-600/30 text-red-400 border border-red-500/30 font-semibold px-2 lg:px-4 py-2 transition-all text-sm lg:text-base whitespace-nowrap"
+                  title={isSurrendering ? "Cooking..." : isOvertime ? "No surrendering in overtime - submit your final message!" : "End the argument and get your personality report"}
+                >
+                  {isSurrendering ? "Cooking..." : surrenderHover ? "Have Mercy! 😭" : "Give Up! 🏳️"}
+                </Button>
+              )}
+            </div>
+          </div>
         </motion.div>
 
         {/* Main Chat Area */}
@@ -1255,9 +1259,11 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.3 }}
                   >
-                    <div className="flex items-center space-x-2">
-                      <span className="text-red-400 text-lg">⏰</span>
-                      <span className="text-red-300 font-semibold">OVERTIME!</span>
+                    <div className="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-2">
+                      <div className="flex items-center space-x-2">
+                        <span className="text-red-400 text-lg">⏰</span>
+                        <span className="text-red-300 font-semibold">OVERTIME!</span>
+                      </div>
                       <span className="text-red-200 text-sm">One final message - make it count!</span>
                     </div>
                   </motion.div>

@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Card } from "./ui/card";
 import { Button } from "./ui/button";
-import { Input } from "./ui/input";
 import { Badge } from "./ui/badge";
-import { ArrowLeft, Clock, Send, Trophy, ExternalLink, Flag, ChevronDown, ChevronRight, Swords, MessageCircle } from "lucide-react";
+import { ArrowLeft, Clock, Send, Trophy, ExternalLink, ChevronDown, ChevronRight, Swords, MessageCircle } from "lucide-react";
 import { motion } from "framer-motion";
 
 // API Configuration
@@ -48,6 +47,7 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
   const [cookingMessageIndex, setCookingMessageIndex] = useState(0);
   const [surrenderHover, setSurrenderHover] = useState(false);
   const [expandedCards, setExpandedCards] = useState<Set<string>>(new Set());
+  const [isOvertime, setIsOvertime] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const hasInitialized = useRef(false);
 
@@ -79,12 +79,20 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
 
   // Timer countdown
   useEffect(() => {
-    if (gameStarted && timeRemaining > 0 && !gameEnded) {
+    if (gameStarted && timeRemaining > 0 && !gameEnded && !isOvertime) {
       const timer = setInterval(() => {
         setTimeRemaining(prev => {
           if (prev <= 1) {
             clearInterval(timer);
-            endSession();
+            // Check if user has text in input box
+            if (userInput.trim()) {
+              // Enter overtime mode - allow final submission
+              setIsOvertime(true);
+              setTimeRemaining(0);
+            } else {
+              // No text, end immediately
+              endSession();
+            }
             return 0;
           }
           return prev - 1;
@@ -93,7 +101,7 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
 
       return () => clearInterval(timer);
     }
-  }, [gameStarted, timeRemaining, gameEnded]);
+  }, [gameStarted, timeRemaining, gameEnded, isOvertime, userInput]);
 
   // Cooking message rotation
   useEffect(() => {
@@ -259,10 +267,21 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const handleSubmitArgument = () => {
+  const handleSubmitArgument = async () => {
     if (userInput.trim() && !isLoading && !gameEnded) {
-      sendArgumentToAPI(userInput.trim());
+      const messageToSend = userInput.trim();
       setUserInput('');
+      
+      if (isOvertime) {
+        // This is the final message in overtime
+        await sendArgumentToAPI(messageToSend);
+        // End session after overtime submission
+        setTimeout(() => {
+          endSession();
+        }, 1000); // Small delay to let the bot response appear
+      } else {
+        sendArgumentToAPI(messageToSend);
+      }
     }
   };
 
@@ -799,9 +818,15 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
           
           <div className="flex items-center space-x-6">
             {/* Timer */}
-            <div className="flex items-center space-x-2 bg-gray-900/50 px-4 py-2 rounded-lg border border-gray-700">
-              <Clock className="w-5 h-5 text-yellow" style={{ color: '#ffcd1a' }} />
-              <span className="font-mono text-lg font-bold">{formatTime(timeRemaining)}</span>
+            <div className={`flex items-center space-x-2 px-4 py-2 rounded-lg border ${
+              isOvertime 
+                ? 'bg-red-900/50 border-red-700 animate-pulse' 
+                : 'bg-gray-900/50 border-gray-700'
+            }`}>
+              <Clock className={`w-5 h-5 ${isOvertime ? 'text-red-400' : 'text-yellow'}`} style={{ color: isOvertime ? '#f87171' : '#ffcd1a' }} />
+              <span className={`font-mono text-lg font-bold ${isOvertime ? 'text-red-400' : 'text-white'}`}>
+                {isOvertime ? 'OVERTIME!' : formatTime(timeRemaining)}
+              </span>
             </div>
             
             {/* Scores */}
@@ -822,11 +847,11 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
             {gameStarted && !gameEnded && (
               <Button
                 onClick={handleSurrender}
-                disabled={isSurrendering}
+                disabled={isSurrendering || isOvertime}
                 onMouseEnter={() => setSurrenderHover(true)}
                 onMouseLeave={() => setSurrenderHover(false)}
                 className="bg-red-600/20 hover:bg-red-600/30 text-red-400 border border-red-500/30 font-semibold px-4 py-2 transition-all"
-                title={isSurrendering ? "Cooking..." : "End the argument and get your personality report"}
+                title={isSurrendering ? "Cooking..." : isOvertime ? "No surrendering in overtime - submit your final message!" : "End the argument and get your personality report"}
               >
                 {isSurrendering ? "Cooking..." : surrenderHover ? "Please, Have Mercy! 😭" : "I Give Up! 🏳️"}
               </Button>
@@ -928,7 +953,6 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
                                 // Handle both [Source] and [Source: url] formats
                                 const sourceRegex = /\[Source(?::\s*[^\]]+)?\]/g;
                                 const parts = message.content.split(sourceRegex);
-                                const matches = message.content.match(sourceRegex) || [];
                                 
                                 let sourceIndex = 0;
                                 return parts.map((part, partIndex) => {
@@ -1089,17 +1113,36 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
 
               {/* Input Area */}
               <div className="border-t border-gray-700/50 p-4 bg-gray-900/30">
+                {/* Overtime Notice */}
+                {isOvertime && (
+                  <motion.div 
+                    className="mb-3 p-3 bg-red-900/20 border border-red-700/50 rounded-lg"
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <div className="flex items-center space-x-2">
+                      <span className="text-red-400 text-lg">⏰</span>
+                      <span className="text-red-300 font-semibold">OVERTIME!</span>
+                      <span className="text-red-200 text-sm">One final message - make it count!</span>
+                    </div>
+                  </motion.div>
+                )}
                 <div className="flex space-x-3">
                   <textarea
                     value={userInput}
                     onChange={(e) => setUserInput(e.target.value)}
                     onKeyDown={handleKeyPress}
-                    placeholder="Type your argument here..."
+                    placeholder={isOvertime ? "Your final argument - make it count!" : "Type your argument here..."}
                     disabled={isLoading || gameEnded}
-                    className="flex-1 bg-gray-800/50 border border-gray-600/50 text-white placeholder-white/50 rounded-xl focus:ring-2 focus:ring-yellow focus:border-yellow transition-all resize-none min-h-[44px] max-h-[200px] py-3 px-4"
+                    className={`flex-1 border rounded-xl transition-all resize-none min-h-[44px] max-h-[200px] py-3 px-4 ${
+                      isOvertime 
+                        ? 'bg-red-900/20 border-red-700/50 text-white placeholder-red-300/70 focus:ring-2 focus:ring-red-400 focus:border-red-400' 
+                        : 'bg-gray-800/50 border-gray-600/50 text-white placeholder-white/50 focus:ring-2 focus:ring-yellow focus:border-yellow'
+                    }`}
                     style={{ 
-                      backgroundColor: 'rgba(31, 41, 55, 0.5)', 
-                      borderColor: 'rgba(75, 85, 99, 0.5)',
+                      backgroundColor: isOvertime ? 'rgba(127, 29, 29, 0.2)' : 'rgba(31, 41, 55, 0.5)', 
+                      borderColor: isOvertime ? 'rgba(185, 28, 28, 0.5)' : 'rgba(75, 85, 99, 0.5)',
                       height: 'auto',
                       overflowY: 'auto'
                     }}
@@ -1113,10 +1156,18 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
                   <Button
                     onClick={handleSubmitArgument}
                     disabled={!userInput.trim() || isLoading || gameEnded}
-                    className="bg-yellow hover:bg-yellow/90 text-black font-semibold px-6 rounded-xl transition-all transform hover:scale-105 disabled:transform-none self-end"
-                    style={{ backgroundColor: '#ffcd1a', color: '#000000' }}
+                    className={`font-semibold px-6 rounded-xl transition-all transform hover:scale-105 disabled:transform-none self-end ${
+                      isOvertime 
+                        ? 'bg-red-600 hover:bg-red-700 text-white border border-red-500' 
+                        : 'bg-yellow hover:bg-yellow/90 text-black'
+                    }`}
+                    style={{ 
+                      backgroundColor: isOvertime ? '#dc2626' : '#ffcd1a', 
+                      color: isOvertime ? '#ffffff' : '#000000' 
+                    }}
                   >
                     <Send className="w-4 h-4" />
+                    {isOvertime && <span className="ml-1 text-xs">FINAL</span>}
                   </Button>
                 </div>
               </div>

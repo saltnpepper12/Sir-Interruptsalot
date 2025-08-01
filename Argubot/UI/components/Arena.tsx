@@ -108,6 +108,16 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
   const startArgumentSession = async (initialMessage: string) => {
     try {
       setIsLoading(true);
+      setGameStarted(true);
+      
+      // Show user's message immediately for responsive feel
+      const userMessage = {
+        role: 'user' as const,
+        content: initialMessage,
+        timestamp: new Date().toISOString()
+      };
+      setMessages([userMessage]);
+      
       const response = await fetch(`${API_BASE_URL}/start_session`, {
         method: 'POST',
         headers: {
@@ -128,25 +138,20 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
       setUserScore(data.user_score);
       setBotScore(data.bot_score);
       setTimeRemaining(data.time_remaining);
-      setGameStarted(true);
 
-      // Add initial messages
-      setMessages([
-        {
-          role: 'user',
-          content: initialMessage,
-          timestamp: new Date().toISOString()
-        },
-        {
-          role: 'bot',
-          content: data.bot_response,
-          timestamp: new Date().toISOString(),
-          sources: data.sources
-        }
-      ]);
+      // Add bot's response to existing messages
+      const botMessage = {
+        role: 'bot' as const,
+        content: data.bot_response,
+        timestamp: new Date().toISOString(),
+        sources: data.sources
+      };
+      setMessages(prev => [...prev, botMessage]);
 
     } catch (error) {
       console.error('Error starting session:', error);
+      // If there's an error, remove the user message we added optimistically
+      setMessages([]);
     } finally {
       setIsLoading(false);
     }

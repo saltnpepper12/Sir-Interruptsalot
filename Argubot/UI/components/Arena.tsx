@@ -925,15 +925,17 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
                         >
                           {message.role === 'bot' && message.sources && message.sources.length > 0 
                             ? (() => {
-                                const parts = message.content.split('[Source]');
+                                // Handle both [Source] and [Source: url] formats
+                                const sourceRegex = /\[Source(?::\s*[^\]]+)?\]/g;
+                                const parts = message.content.split(sourceRegex);
+                                const matches = message.content.match(sourceRegex) || [];
+                                
+                                let sourceIndex = 0;
                                 return parts.map((part, partIndex) => {
-                                  if (partIndex === 0) return part;
+                                  if (partIndex === 0) return <span key={partIndex}>{part}</span>;
                                   
-                                  const sourceIndex = partIndex - 1;
                                   const source = message.sources?.[sourceIndex];
-                                  
-                                  // Debug logging
-                                  console.log('Source parsing:', { partIndex, sourceIndex, source, sourcesLength: message.sources?.length });
+                                  sourceIndex++;
                                   
                                   // Only render source link if we have a valid source with a link
                                   if (source && source.link && typeof source.link === 'string') {
@@ -941,8 +943,8 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
                                       <span key={partIndex}>
                                         <a
                                           href={source.link}
-                                target="_blank" 
-                                rel="noopener noreferrer"
+                                          target="_blank" 
+                                          rel="noopener noreferrer"
                                           className="inline-flex items-center px-2 py-1 bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 text-xs rounded-full border border-blue-500/30 transition-all hover:scale-105 mx-1"
                                         >
                                           <ExternalLink className="w-3 h-3 mr-1" />
@@ -952,8 +954,7 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
                                       </span>
                                     );
                                   } else {
-                                    // If no valid source, just return the text without a link
-                                    console.log('Invalid source found:', source);
+                                    // If no valid source, just return the text
                                     return <span key={partIndex}>{part}</span>;
                                   }
                                 });

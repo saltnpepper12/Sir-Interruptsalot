@@ -95,15 +95,15 @@ export default function App() {
             onClick={(e) => e.stopPropagation()}
           >
             <Card 
-              className="p-6 bg-gradient-to-br from-gray-700/10 to-gray-800/5 border-2 border-gray-600/50 relative overflow-hidden"
+              className="p-6 bg-gradient-to-br from-slate-800/20 to-slate-900/10 border-2 border-cyan-500/40 relative overflow-hidden"
               style={{ 
-                backgroundColor: 'rgba(10, 10, 10, 0.95)',
-                borderColor: 'rgba(75, 85, 99, 0.5)',
-                boxShadow: '0 0 50px rgba(75, 85, 99, 0.2)'
+                backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                borderColor: 'rgba(6, 182, 212, 0.4)',
+                boxShadow: '0 0 50px rgba(6, 182, 212, 0.3)'
               }}
             >
               {/* Background decoration */}
-              <div className="absolute inset-0 bg-gradient-to-br from-gray-700/5 to-transparent"></div>
+              <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-transparent"></div>
               
                              {/* Close button */}
                <Button
@@ -122,18 +122,18 @@ export default function App() {
                   <motion.div
                     animate={{ rotate: [0, 5, -5, 0] }}
                     transition={{ duration: 2, repeat: Infinity }}
-                    className="w-16 h-16 bg-yellow-400/20 rounded-full flex items-center justify-center"
-                    style={{ backgroundColor: 'rgba(251, 191, 36, 0.2)' }}
+                    className="w-16 h-16 bg-cyan-400/20 rounded-full flex items-center justify-center"
+                    style={{ backgroundColor: 'rgba(34, 211, 238, 0.2)' }}
                   >
-                    <Scale className="w-8 h-8 text-yellow-400" style={{ color: '#fbbf24' }} />
+                    <Scale className="w-8 h-8 text-cyan-400" style={{ color: '#22d3ee' }} />
                   </motion.div>
                 </div>
                 
                 {/* Quote */}
                 <div className="text-center space-y-4">
                   <div className="relative">
-                    <div className="text-4xl text-white/20 absolute -left-2 -top-2">"</div>
-                    <div className="text-4xl text-white/20 absolute -right-2 -bottom-6">"</div>
+                    <div className="text-4xl text-cyan-300/30 absolute -left-2 -top-2">"</div>
+                    <div className="text-4xl text-cyan-300/30 absolute -right-2 -bottom-6">"</div>
                                          <motion.p 
                        initial={{ opacity: 0, y: 10 }}
                        animate={{ opacity: 1, y: 0 }}
@@ -141,9 +141,9 @@ export default function App() {
                        className="text-white text-base leading-relaxed px-4"
                      >
                        In the legal industry, having the facts isn't enough — it's the 
-                       <span className="text-yellow-400 font-semibold" style={{ color: '#fbbf24' }}> strength of your argument </span>
+                       <span className="text-cyan-400 font-semibold" style={{ color: '#22d3ee' }}> strength of your argument </span>
                        that wins. That's why lawyers need to continually build their 
-                       <span className="text-yellow-400 font-semibold" style={{ color: '#fbbf24' }}>'argument muscle.'</span>
+                       <span className="text-cyan-400 font-semibold" style={{ color: '#22d3ee' }}>'argument muscle.'</span>
                      </motion.p>
                   </div>
                   
@@ -159,8 +159,11 @@ export default function App() {
                      >
                                              <Button
                          onClick={() => setShowWelcomePopup(false)}
-                         className="bg-white hover:bg-gray-100 text-black font-semibold px-6 py-2 transition-all transform hover:scale-105 active:scale-95 border-2 border-yellow-400"
-                         style={{ backgroundColor: '#ffffff', color: '#000000', borderColor: '#fbbf24' }}
+                         className="bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-600 hover:to-teal-600 text-white font-semibold px-6 py-2 transition-all transform hover:scale-105 active:scale-95 shadow-lg shadow-cyan-500/30"
+                         style={{ 
+                           background: 'linear-gradient(90deg, #06b6d4, #14b8a6)',
+                           color: '#ffffff' 
+                         }}
                        >
                          Let's Build That Muscle! 💪
                        </Button>
@@ -221,16 +224,20 @@ export default function App() {
             animate={{ scale: 1 }}
             transition={{ duration: 0.5, delay: 0.2 }}
           >
-            <Swords className="w-10 h-10 text-white mr-4 drop-shadow-lg" style={{ color: '#ffffff' }} />
+            <Swords className="w-10 h-10 text-cyan-400 mr-4 drop-shadow-lg" style={{ color: '#22d3ee' }} />
             <div className="text-center">
-              <h1 className="text-4xl md:text-5xl font-bold text-white drop-shadow-lg tracking-wider" style={{ color: '#ffffff' }}>
+              <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-cyan-400 via-teal-400 to-cyan-300 bg-clip-text text-transparent drop-shadow-lg tracking-wider" style={{ 
+                background: 'linear-gradient(45deg, #22d3ee, #2dd4bf, #67e8f9)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent'
+              }}>
                 Sir Interruptsalot
               </h1>
-              <p className="text-lg md:text-xl text-gray-300 mt-2 font-medium tracking-wide" style={{ color: '#d1d5db' }}>
+              <p className="text-lg md:text-xl text-slate-300 mt-2 font-medium tracking-wide" style={{ color: '#cbd5e1' }}>
                 The Undefeated Debate Champion
               </p>
             </div>
-            <Target className="w-10 h-10 text-white ml-4 drop-shadow-lg" style={{ color: '#ffffff' }} />
+            <Target className="w-10 h-10 text-cyan-400 ml-4 drop-shadow-lg" style={{ color: '#22d3ee' }} />
           </motion.div>
 
           <motion.div 
@@ -242,20 +249,20 @@ export default function App() {
             <h2 className="text-2xl md:text-3xl text-foreground font-semibold">
               Ready to argue with the undefeated champion? 
             </h2>
-            <p className="text-lg text-muted-foreground">
-              Bring your <span className="text-yellow-400 font-semibold">strongest opinion</span> and let's see if you can out-argue an AI that's never lost a debate
+            <p className="text-lg text-slate-300">
+              Bring your <span className="text-cyan-400 font-semibold">strongest opinion</span> and let's see if you can out-argue an AI that's never lost a debate
             </p>
-            <div className="flex items-center justify-center gap-6 text-sm text-muted-foreground">
+            <div className="flex items-center justify-center gap-6 text-sm text-slate-400">
               <div className="flex items-center gap-2">
-                <Zap className="w-4 h-4 text-yellow-400 drop-shadow-sm" />
+                <Zap className="w-4 h-4 text-cyan-400 drop-shadow-sm" />
                 <span>5-minute rounds</span>
               </div>
               <div className="flex items-center gap-2">
-                <Target className="w-4 h-4 text-yellow-400 drop-shadow-sm" />
+                <Target className="w-4 h-4 text-cyan-400 drop-shadow-sm" />
                 <span>Judge picks winner (+1 point)</span>
               </div>
               <div className="flex items-center gap-2">
-                <MessageCircle className="w-4 h-4 text-yellow-400 drop-shadow-sm" />
+                <MessageCircle className="w-4 h-4 text-cyan-400 drop-shadow-sm" />
                 <span>Personality report at end</span>
               </div>
             </div>
@@ -269,7 +276,7 @@ export default function App() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.6 }}
         >
-          <Card className="p-8 border-2 border-gray-700/50 bg-card/80 backdrop-blur-sm shadow-2xl shadow-gray-500/10" style={{ backgroundColor: '#0a0a0a', borderColor: '#374151' }}>
+          <Card className="p-8 border-2 border-cyan-500/30 bg-card/80 backdrop-blur-sm shadow-2xl shadow-cyan-500/20" style={{ backgroundColor: 'rgba(15, 23, 42, 0.95)', borderColor: 'rgba(6, 182, 212, 0.3)' }}>
             <div className="space-y-6">
               <div className="text-center">
                 <h3 className="text-xl font-semibold mb-2">What's your strongest take?</h3>
@@ -285,10 +292,10 @@ export default function App() {
                   onChange={(e) => setUserArgument(e.target.value)}
                   onKeyDown={handleKeyPress}
                   placeholder="Type your argument here... (e.g., 'Pineapple on pizza is actually amazing and anyone who disagrees has no taste')"
-                  className="w-full h-32 px-4 py-3 bg-input border border-border rounded-lg resize-none text-base focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition-all text-white placeholder-gray-400"
+                  className="w-full h-32 px-4 py-3 bg-input border border-border rounded-lg resize-none text-base focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 transition-all text-white placeholder-slate-400"
                   style={{ 
-                    backgroundColor: '#1a1a1a', 
-                    borderColor: '#374151'
+                    backgroundColor: 'rgba(30, 41, 59, 0.8)', 
+                    borderColor: 'rgba(71, 85, 105, 0.8)'
                   }}
                 />
                 
@@ -304,8 +311,11 @@ export default function App() {
                 <Button 
                   onClick={handleStartArgument}
                   disabled={!userArgument.trim()}
-                  className="w-full bg-white hover:bg-gray-100 text-black font-semibold py-3 text-base transition-all transform hover:scale-[1.02] disabled:transform-none disabled:opacity-50 shadow-lg shadow-white/20 border-2 border-yellow-400"
-                  style={{ backgroundColor: '#ffffff', color: '#000000', borderColor: '#fbbf24' }}
+                  className="w-full bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-600 hover:to-teal-600 text-white font-semibold py-3 text-base transition-all transform hover:scale-[1.02] disabled:transform-none disabled:opacity-50 shadow-lg shadow-cyan-500/30"
+                  style={{ 
+                    background: 'linear-gradient(90deg, #06b6d4, #14b8a6)',
+                    color: '#ffffff' 
+                  }}
                   size="lg"
                 >
                   <Send className="w-5 h-5 mr-2" />

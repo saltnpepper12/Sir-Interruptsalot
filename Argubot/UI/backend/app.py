@@ -36,6 +36,7 @@ bot = SassyArgumentBot()
 class ArgumentRequest(BaseModel):
     message: str
     session_id: Optional[str] = None
+    is_overtime: Optional[bool] = False
 
 class ArgumentResponse(BaseModel):
     bot_response: str
@@ -283,9 +284,9 @@ async def send_argument(request: ArgumentRequest):
         if not bot.session or not bot.session.is_active:
             raise HTTPException(status_code=400, detail="No active session")
         
-        # Check if time is up
+        # Check if time is up (but allow overtime messages)
         elapsed_time = (datetime.now() - bot.session.start_time).total_seconds()
-        if elapsed_time >= 300:  # 5 minutes
+        if elapsed_time >= 300 and not request.is_overtime:  # 5 minutes
             bot.session.is_active = False
             return ArgumentResponse(
                 bot_response="⏰ Time's up! The argument session has ended.",
@@ -322,7 +323,13 @@ async def send_argument(request: ArgumentRequest):
                     "snippet": fact.get("snippet", "")
                 })
         
-        time_remaining = max(0, 300 - int(elapsed_time))
+        # Handle time remaining and game end for overtime
+        if request.is_overtime:
+            time_remaining = 0
+            game_ended = True  # End after this overtime exchange
+        else:
+            time_remaining = max(0, 300 - int(elapsed_time))
+            game_ended = False
         
         # Use the actual judge reasoning instead of generic status update
         judge_insight = judge_result.get("reasoning", "Judge was unable to provide reasoning for this round.")
@@ -333,7 +340,7 @@ async def send_argument(request: ArgumentRequest):
             user_score=bot.session.user_score,
             bot_score=bot.session.bot_score,
             time_remaining=time_remaining,
-            game_ended=False,
+            game_ended=game_ended,
             sources=sources,
             status_update=judge_insight
         )

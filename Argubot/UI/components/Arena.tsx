@@ -165,7 +165,7 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
     }
   };
 
-  const sendArgumentToAPI = async (message: string) => {
+  const sendArgumentToAPI = async (message: string, overtime: boolean = false) => {
     if (!sessionId || gameEnded) return;
 
     try {
@@ -187,7 +187,8 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
         },
         body: JSON.stringify({
           message: message,
-          session_id: sessionId
+          session_id: sessionId,
+          is_overtime: overtime
         })
       });
 
@@ -214,6 +215,17 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
       // Update judge ruling if available
       if (data.status_update) {
         setCurrentJudgeRuling(data.status_update);
+      }
+
+      // If game ended (overtime response), automatically trigger end session after showing bot response
+      if (data.game_ended) {
+        setTimeout(() => {
+          if (!isSurrendering) { // Only if not already surrendering
+            setIsSurrendering(true);
+            setCookingMessageIndex(0);
+            endSession();
+          }
+        }, 2000); // 2 second delay to let user read the bot's response
       }
 
     } catch (error) {
@@ -274,13 +286,10 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
       
       if (isOvertime) {
         // This is the final message in overtime
-        await sendArgumentToAPI(messageToSend);
-        // End session after overtime submission
-        setTimeout(() => {
-          endSession();
-        }, 1000); // Small delay to let the bot response appear
+        await sendArgumentToAPI(messageToSend, true);
+        // Backend will return game_ended: true, which will trigger natural end flow
       } else {
-        sendArgumentToAPI(messageToSend);
+        sendArgumentToAPI(messageToSend, false);
       }
     }
   };

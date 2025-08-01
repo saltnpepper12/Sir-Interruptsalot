@@ -50,6 +50,8 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
   const [isOvertime, setIsOvertime] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const hasInitialized = useRef(false);
+  const previousMessageCount = useRef(0);
+  const scrollContainer = useRef<HTMLDivElement>(null);
 
   const cookingMessages = [
     "Analyzing your argument patterns... 🧠",
@@ -64,9 +66,33 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
     "Your personality roast is almost ready... 🎪"
   ];
 
-  // Auto-scroll to bottom when messages update
+  // Smart auto-scroll that's mobile-friendly
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    const currentMessageCount = messages.length;
+    const hasNewMessage = currentMessageCount > previousMessageCount.current;
+    
+    if (hasNewMessage && messagesEndRef.current && scrollContainer.current) {
+      const container = scrollContainer.current;
+      const isNearBottom = container.scrollTop > (container.scrollHeight - container.clientHeight - 100);
+      const isMobile = window.innerWidth < 1024; // lg breakpoint
+      
+      // Only auto-scroll if:
+      // 1. User is near the bottom (actively following conversation)
+      // 2. OR it's a new message and not mobile (desktop users expect auto-scroll)
+      if (isNearBottom || (!isMobile && hasNewMessage)) {
+        // Delay scroll on mobile to let users read their message first
+        const scrollDelay = isMobile ? 2000 : 500;
+        
+        setTimeout(() => {
+          messagesEndRef.current?.scrollIntoView({ 
+            behavior: 'smooth',
+            block: 'nearest' // Less aggressive scrolling
+          });
+        }, scrollDelay);
+      }
+    }
+    
+    previousMessageCount.current = currentMessageCount;
   }, [messages]);
 
   // Auto-start session if initial message is provided
@@ -955,7 +981,7 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
           <div className="lg:col-span-3">
             <Card className="bg-gray-900/50 border-2 border-yellow/30 backdrop-blur-sm shadow-2xl shadow-yellow/10 min-h-[75vh] flex flex-col" style={{ backgroundColor: 'rgba(17, 17, 17, 0.5)', borderColor: 'rgba(255, 205, 26, 0.3)' }}>
               {/* Messages Area */}
-              <div className="flex-1 overflow-y-auto p-6 space-y-4 max-h-[65vh]">
+              <div ref={scrollContainer} className="flex-1 overflow-y-auto p-6 space-y-4 max-h-[65vh]">
                 {messages.length === 0 && !isLoading ? (
                   <div className="text-center text-white/60 py-12">
                     <div className="w-16 h-16 bg-yellow/10 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: 'rgba(255, 205, 26, 0.1)' }}>

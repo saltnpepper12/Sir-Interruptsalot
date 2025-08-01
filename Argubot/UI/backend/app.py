@@ -36,7 +36,6 @@ bot = SassyArgumentBot()
 class ArgumentRequest(BaseModel):
     message: str
     session_id: Optional[str] = None
-    is_final_message: Optional[bool] = False
 
 class ArgumentResponse(BaseModel):
     bot_response: str
@@ -286,24 +285,17 @@ async def send_argument(request: ArgumentRequest):
         
         # Check if time is up
         elapsed_time = (datetime.now() - bot.session.start_time).total_seconds()
-        print(f"DEBUG: elapsed_time={elapsed_time}, is_final_message={request.is_final_message}")
-        
         if elapsed_time >= 300:  # 5 minutes
-            # If this is marked as a final message, allow it to proceed
-            if not request.is_final_message:
-                print("DEBUG: Time up, not final message - ending session")
-                bot.session.is_active = False
-                return ArgumentResponse(
-                    bot_response="⏰ Time's up! The argument session has ended.",
-                    session_id=bot.session.session_id,
-                    user_score=bot.session.user_score,
-                    bot_score=bot.session.bot_score,
-                    time_remaining=0,
-                    game_ended=True,
-                    sources=[]
-                )
-            else:
-                print("DEBUG: Time up, but this is final message - processing normally")
+            bot.session.is_active = False
+            return ArgumentResponse(
+                bot_response="⏰ Time's up! The argument session has ended.",
+                session_id=bot.session.session_id,
+                user_score=bot.session.user_score,
+                bot_score=bot.session.bot_score,
+                time_remaining=0,
+                game_ended=True,
+                sources=[]
+            )
         
         # Get facts for the argument
         facts = await search_facts(request.message)
@@ -335,18 +327,13 @@ async def send_argument(request: ArgumentRequest):
         # Use the actual judge reasoning instead of generic status update
         judge_insight = judge_result.get("reasoning", "Judge was unable to provide reasoning for this round.")
         
-        # If this was a final message, mark the game as ended
-        game_ended = request.is_final_message or False
-        if game_ended:
-            bot.session.is_active = False
-        
         return ArgumentResponse(
             bot_response=bot_response,
             session_id=bot.session.session_id,
             user_score=bot.session.user_score,
             bot_score=bot.session.bot_score,
             time_remaining=time_remaining,
-            game_ended=game_ended,
+            game_ended=False,
             sources=sources,
             status_update=judge_insight
         )

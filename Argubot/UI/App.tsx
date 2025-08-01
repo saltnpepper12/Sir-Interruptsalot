@@ -95,15 +95,15 @@ export default function App() {
             onClick={(e) => e.stopPropagation()}
           >
             <Card 
-              className="p-6 bg-gradient-to-br from-yellow/10 to-yellow/5 border-2 border-yellow/50 relative overflow-hidden"
+              className="p-6 bg-gradient-to-br from-indigo-500/10 to-indigo-500/5 border-2 border-indigo-500/50 relative overflow-hidden"
               style={{ 
                 backgroundColor: 'rgba(10, 10, 10, 0.95)',
-                borderColor: 'rgba(255, 205, 26, 0.5)',
-                boxShadow: '0 0 50px rgba(255, 205, 26, 0.2)'
+                borderColor: 'rgba(99, 102, 241, 0.5)',
+                boxShadow: '0 0 50px rgba(99, 102, 241, 0.2)'
               }}
             >
               {/* Background decoration */}
-              <div className="absolute inset-0 bg-gradient-to-br from-yellow/5 to-transparent"></div>
+              <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-transparent"></div>
               
                              {/* Close button */}
                <Button
@@ -122,18 +122,18 @@ export default function App() {
                   <motion.div
                     animate={{ rotate: [0, 5, -5, 0] }}
                     transition={{ duration: 2, repeat: Infinity }}
-                    className="w-16 h-16 bg-yellow/20 rounded-full flex items-center justify-center"
-                    style={{ backgroundColor: 'rgba(255, 205, 26, 0.2)' }}
+                    className="w-16 h-16 bg-indigo-500/20 rounded-full flex items-center justify-center"
+                    style={{ backgroundColor: 'rgba(99, 102, 241, 0.2)' }}
                   >
-                    <Scale className="w-8 h-8 text-yellow" style={{ color: '#ffcd1a' }} />
+                    <Scale className="w-8 h-8 text-indigo-400" style={{ color: '#818cf8' }} />
                   </motion.div>
                 </div>
                 
                 {/* Quote */}
                 <div className="text-center space-y-4">
                   <div className="relative">
-                    <div className="text-4xl text-yellow/30 absolute -left-2 -top-2">"</div>
-                    <div className="text-4xl text-yellow/30 absolute -right-2 -bottom-6">"</div>
+                    <div className="text-4xl text-indigo-400/30 absolute -left-2 -top-2">"</div>
+                    <div className="text-4xl text-indigo-400/30 absolute -right-2 -bottom-6">"</div>
                                          <motion.p 
                        initial={{ opacity: 0, y: 10 }}
                        animate={{ opacity: 1, y: 0 }}
@@ -141,9 +141,9 @@ export default function App() {
                        className="text-white text-base leading-relaxed px-4"
                      >
                        In the legal industry, having the facts isn't enough — it's the 
-                       <span className="text-yellow font-semibold" style={{ color: '#ffcd1a' }}> strength of your argument </span>
+                       <span className="text-indigo-400 font-semibold" style={{ color: '#818cf8' }}> strength of your argument </span>
                        that wins. That's why lawyers need to continually build their 
-                       <span className="text-yellow font-semibold" style={{ color: '#ffcd1a' }}>'argument muscle.'</span>
+                       <span className="text-indigo-400 font-semibold" style={{ color: '#818cf8' }}>'argument muscle.'</span>
                      </motion.p>
                   </div>
                   
@@ -159,8 +159,8 @@ export default function App() {
                      >
                                              <Button
                          onClick={() => setShowWelcomePopup(false)}
-                         className="bg-yellow hover:bg-yellow/90 text-black font-semibold px-6 py-2 transition-all transform hover:scale-105 active:scale-95"
-                         style={{ backgroundColor: '#ffcd1a', color: '#000000' }}
+                         className="bg-indigo-500 hover:bg-indigo-600 text-white font-semibold px-6 py-2 transition-all transform hover:scale-105 active:scale-95"
+                         style={{ backgroundColor: '#6366f1', color: '#ffffff' }}
                        >
                          Let's Build That Muscle! 💪
                        </Button>
@@ -221,16 +221,16 @@ export default function App() {
             animate={{ scale: 1 }}
             transition={{ duration: 0.5, delay: 0.2 }}
           >
-            <Swords className="w-10 h-10 text-yellow mr-4 drop-shadow-lg" style={{ color: '#ffcd1a' }} />
+            <Swords className="w-10 h-10 text-indigo-400 mr-4 drop-shadow-lg" style={{ color: '#818cf8' }} />
             <div className="text-center">
-              <h1 className="text-4xl md:text-5xl font-bold text-yellow drop-shadow-lg tracking-wider" style={{ color: '#ffcd1a' }}>
+              <h1 className="text-4xl md:text-5xl font-bold text-indigo-400 drop-shadow-lg tracking-wider" style={{ color: '#818cf8' }}>
                 Sir Interruptsalot
               </h1>
-              <p className="text-lg md:text-xl text-yellow-muted mt-2 font-medium tracking-wide" style={{ color: '#fbbf24' }}>
+              <p className="text-lg md:text-xl text-indigo-300 mt-2 font-medium tracking-wide" style={{ color: '#a5b4fc' }}>
                 The Undefeated Debate Champion
               </p>
             </div>
-            <Target className="w-10 h-10 text-yellow ml-4 drop-shadow-lg" style={{ color: '#ffcd1a' }} />
+            <Target className="w-10 h-10 text-indigo-400 ml-4 drop-shadow-lg" style={{ color: '#818cf8' }} />
           </motion.div>
 
           <motion.div 
@@ -243,19 +243,19 @@ export default function App() {
               Ready to argue with the undefeated champion? 
             </h2>
             <p className="text-lg text-muted-foreground">
-              Bring your <span className="text-yellow font-semibold">strongest opinion</span> and let's see if you can out-argue an AI that's never lost a debate
+              Bring your <span className="text-indigo-400 font-semibold">strongest opinion</span> and let's see if you can out-argue an AI that's never lost a debate
             </p>
             <div className="flex items-center justify-center gap-6 text-sm text-muted-foreground">
               <div className="flex items-center gap-2">
-                <Zap className="w-4 h-4 text-yellow drop-shadow-sm" />
+                <Zap className="w-4 h-4 text-indigo-400 drop-shadow-sm" />
                 <span>5-minute rounds</span>
               </div>
               <div className="flex items-center gap-2">
-                <Target className="w-4 h-4 text-yellow drop-shadow-sm" />
+                <Target className="w-4 h-4 text-indigo-400 drop-shadow-sm" />
                 <span>Judge picks winner (+1 point)</span>
               </div>
               <div className="flex items-center gap-2">
-                <MessageCircle className="w-4 h-4 text-yellow drop-shadow-sm" />
+                <MessageCircle className="w-4 h-4 text-indigo-400 drop-shadow-sm" />
                 <span>Personality report at end</span>
               </div>
             </div>
@@ -269,7 +269,7 @@ export default function App() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.6 }}
         >
-          <Card className="p-8 border-2 border-yellow/30 bg-card/80 backdrop-blur-sm shadow-2xl shadow-yellow/10" style={{ backgroundColor: '#0a0a0a', borderColor: '#ffcd1a' }}>
+          <Card className="p-8 border-2 border-indigo-500/30 bg-card/80 backdrop-blur-sm shadow-2xl shadow-indigo-500/10" style={{ backgroundColor: '#0a0a0a', borderColor: '#6366f1' }}>
             <div className="space-y-6">
               <div className="text-center">
                 <h3 className="text-xl font-semibold mb-2">What's your strongest take?</h3>
@@ -285,8 +285,11 @@ export default function App() {
                   onChange={(e) => setUserArgument(e.target.value)}
                   onKeyDown={handleKeyPress}
                   placeholder="Type your argument here... (e.g., 'Pineapple on pizza is actually amazing and anyone who disagrees has no taste')"
-                  className="w-full h-32 px-4 py-3 bg-input border border-border rounded-lg resize-none text-base focus:ring-2 focus:ring-yellow focus:border-yellow transition-all placeholder:text-muted-foreground/60 text-foreground"
-                  style={{ backgroundColor: '#1a1a1a', borderColor: '#262626', color: '#ffffff' }}
+                  className="w-full h-32 px-4 py-3 bg-input border border-border rounded-lg resize-none text-base focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-white placeholder-gray-400"
+                  style={{ 
+                    backgroundColor: '#1a1a1a', 
+                    borderColor: '#374151'
+                  }}
                 />
                 
                 <div className="flex items-center justify-between">
@@ -301,8 +304,8 @@ export default function App() {
                 <Button 
                   onClick={handleStartArgument}
                   disabled={!userArgument.trim()}
-                  className="w-full bg-yellow hover:bg-yellow-muted text-black font-semibold py-3 text-base transition-all transform hover:scale-[1.02] disabled:transform-none disabled:opacity-50 shadow-lg shadow-yellow/20"
-                  style={{ backgroundColor: '#ffcd1a', color: '#000000' }}
+                  className="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-3 text-base transition-all transform hover:scale-[1.02] disabled:transform-none disabled:opacity-50 shadow-lg shadow-indigo-500/20"
+                  style={{ backgroundColor: '#6366f1', color: '#ffffff' }}
                   size="lg"
                 >
                   <Send className="w-5 h-5 mr-2" />

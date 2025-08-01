@@ -682,8 +682,8 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
                           <ChevronRight className="w-5 h-5" />
                         )}
                       </motion.div>
-                    </div>
-                    
+              </div>
+              
                     <motion.div
                       initial={false}
                       animate={{
@@ -733,10 +733,10 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
                       >
                         "{section.content.split('\n')[0].replace(/^•\s*/, '')}..."
                       </motion.div>
-                    )}
-                  </div>
-                </Card>
-              </motion.div>
+              )}
+            </div>
+          </Card>
+        </motion.div>
             ))}
           </div>
 
@@ -1078,19 +1078,30 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
               {/* Input Area */}
               <div className="border-t border-gray-700/50 p-4 bg-gray-900/30">
                 <div className="flex space-x-3">
-                  <Input
+                  <textarea
                     value={userInput}
                     onChange={(e) => setUserInput(e.target.value)}
-                    onKeyPress={handleKeyPress}
+                    onKeyDown={handleKeyPress}
                     placeholder="Type your argument here..."
                     disabled={isLoading || gameEnded}
-                    className="flex-1 bg-gray-800/50 border-gray-600/50 text-white placeholder-white/50 rounded-xl focus:ring-2 focus:ring-yellow focus:border-yellow transition-all"
-                    style={{ backgroundColor: 'rgba(31, 41, 55, 0.5)', borderColor: 'rgba(75, 85, 99, 0.5)' }}
+                    className="flex-1 bg-gray-800/50 border border-gray-600/50 text-white placeholder-white/50 rounded-xl focus:ring-2 focus:ring-yellow focus:border-yellow transition-all resize-none min-h-[44px] max-h-[200px] py-3 px-4"
+                    style={{ 
+                      backgroundColor: 'rgba(31, 41, 55, 0.5)', 
+                      borderColor: 'rgba(75, 85, 99, 0.5)',
+                      height: 'auto',
+                      overflowY: 'auto'
+                    }}
+                    rows={1}
+                    onInput={(e) => {
+                      const target = e.target as HTMLTextAreaElement;
+                      target.style.height = 'auto';
+                      target.style.height = Math.min(target.scrollHeight, 200) + 'px';
+                    }}
                   />
                   <Button
                     onClick={handleSubmitArgument}
                     disabled={!userInput.trim() || isLoading || gameEnded}
-                    className="bg-yellow hover:bg-yellow/90 text-black font-semibold px-6 rounded-xl transition-all transform hover:scale-105 disabled:transform-none"
+                    className="bg-yellow hover:bg-yellow/90 text-black font-semibold px-6 rounded-xl transition-all transform hover:scale-105 disabled:transform-none self-end"
                     style={{ backgroundColor: '#ffcd1a', color: '#000000' }}
                   >
                     <Send className="w-4 h-4" />

@@ -36,6 +36,7 @@ bot = SassyArgumentBot()
 class ArgumentRequest(BaseModel):
     message: str
     session_id: Optional[str] = None
+    is_final_message: Optional[bool] = False
 
 class ArgumentResponse(BaseModel):
     bot_response: str
@@ -286,16 +287,18 @@ async def send_argument(request: ArgumentRequest):
         # Check if time is up
         elapsed_time = (datetime.now() - bot.session.start_time).total_seconds()
         if elapsed_time >= 300:  # 5 minutes
-            bot.session.is_active = False
-            return ArgumentResponse(
-                bot_response="⏰ Time's up! The argument session has ended.",
-                session_id=bot.session.session_id,
-                user_score=bot.session.user_score,
-                bot_score=bot.session.bot_score,
-                time_remaining=0,
-                game_ended=True,
-                sources=[]
-            )
+            # If this is marked as a final message, allow it to proceed
+            if not request.is_final_message:
+                bot.session.is_active = False
+                return ArgumentResponse(
+                    bot_response="⏰ Time's up! The argument session has ended.",
+                    session_id=bot.session.session_id,
+                    user_score=bot.session.user_score,
+                    bot_score=bot.session.bot_score,
+                    time_remaining=0,
+                    game_ended=True,
+                    sources=[]
+                )
         
         # Get facts for the argument
         facts = await search_facts(request.message)
@@ -327,13 +330,18 @@ async def send_argument(request: ArgumentRequest):
         # Use the actual judge reasoning instead of generic status update
         judge_insight = judge_result.get("reasoning", "Judge was unable to provide reasoning for this round.")
         
+        # If this was a final message, mark the game as ended
+        game_ended = request.is_final_message or False
+        if game_ended:
+            bot.session.is_active = False
+        
         return ArgumentResponse(
             bot_response=bot_response,
             session_id=bot.session.session_id,
             user_score=bot.session.user_score,
             bot_score=bot.session.bot_score,
             time_remaining=time_remaining,
-            game_ended=False,
+            game_ended=game_ended,
             sources=sources,
             status_update=judge_insight
         )

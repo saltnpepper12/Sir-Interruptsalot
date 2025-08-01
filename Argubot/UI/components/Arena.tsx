@@ -190,7 +190,8 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
         },
         body: JSON.stringify({
           message: message,
-          session_id: sessionId
+          session_id: sessionId,
+          is_final_message: allowFinalMessage
         })
       });
 
@@ -219,12 +220,8 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
         setCurrentJudgeRuling(data.status_update);
       }
 
-      // If this was the final message after timer expiration, end the session
-      if (allowFinalMessage) {
-        setTimeout(() => {
-          endSession();
-        }, 2000); // Give user time to read the bot's final response
-      }
+      // If this was the final message, the backend has already marked the game as ended
+      // The game will transition to the report screen automatically
 
     } catch (error) {
       console.error('Error sending argument:', error);

@@ -218,14 +218,20 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
       }
 
       // If game ended (overtime response), automatically trigger end session after showing bot response
-      if (data.game_ended) {
+      if (data.game_ended && isOvertime) {
+        console.log('Overtime game ended - starting transition to cooking screen');
         setTimeout(() => {
-          if (!isSurrendering) { // Only if not already surrendering
+          if (!isSurrendering && !finalReport) { // Only if not already in progress
+            console.log('Triggering cooking screen for overtime');
             setIsSurrendering(true);
             setCookingMessageIndex(0);
-            endSession();
+            // Longer delay to ensure cooking screen is visible
+            setTimeout(() => {
+              console.log('Calling endSession after cooking screen');
+              endSession();
+            }, 2000); // 2 second delay to show cooking screen
           }
-        }, 2000); // 2 second delay to let user read the bot's response
+        }, 3000); // 3 second delay to let user read the bot's response
       }
 
     } catch (error) {
@@ -963,12 +969,22 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
                                 const sourceRegex = /\[Source(?::\s*[^\]]+)?\]/g;
                                 const parts = message.content.split(sourceRegex);
                                 
+                                console.log('Source parsing debug:', {
+                                  messageContent: message.content,
+                                  sourcesArray: message.sources,
+                                  sourcesLength: message.sources?.length,
+                                  parts: parts,
+                                  hasSourceMatches: sourceRegex.test(message.content)
+                                });
+                                
                                 let sourceIndex = 0;
                                 return parts.map((part, partIndex) => {
                                   if (partIndex === 0) return <span key={partIndex}>{part}</span>;
                                   
                                   const source = message.sources?.[sourceIndex];
                                   sourceIndex++;
+                                  
+                                  console.log('Processing source:', { partIndex, sourceIndex: sourceIndex-1, source });
                                   
                                   // Only render source link if we have a valid source with a link
                                   if (source && source.link && typeof source.link === 'string') {
@@ -988,6 +1004,7 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
                                     );
                                   } else {
                                     // If no valid source, just return the text
+                                    console.log('No valid source found, returning raw text');
                                     return <span key={partIndex}>{part}</span>;
                                   }
                                 });

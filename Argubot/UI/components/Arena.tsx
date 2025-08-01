@@ -779,12 +779,87 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
             ))}
           </div>
 
+          {/* Conversation Transcript */}
+          <motion.div 
+            className="mt-10"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 1.6 }}
+          >
+            <Card className="bg-gray-800 border border-gray-600 shadow-lg">
+              <div className="p-6">
+                <motion.h3 
+                  className="text-xl font-semibold text-yellow mb-4 flex items-center space-x-2" 
+                  style={{ color: '#ffcd1a' }}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.4, delay: 1.7 }}
+                >
+                  <MessageCircle className="w-5 h-5" />
+                  <span>📜 Conversation Transcript</span>
+                </motion.h3>
+                
+                <motion.p 
+                  className="text-white/60 text-sm mb-4"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.4, delay: 1.8 }}
+                >
+                  Here's the full conversation that led to your personality analysis:
+                </motion.p>
+
+                <div className="bg-gray-900/50 rounded-lg p-4 max-h-96 overflow-y-auto">
+                  <div className="space-y-4">
+                    {messages.map((message, index) => (
+                      <motion.div
+                        key={index}
+                        className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.3, delay: 1.9 + index * 0.1 }}
+                      >
+                        <div className={`max-w-[80%] rounded-lg p-3 ${
+                          message.role === 'user' 
+                            ? 'bg-blue-600/20 border border-blue-500/30' 
+                            : 'bg-gray-700/50 border border-gray-600/50'
+                        }`}>
+                          <div className="flex items-center space-x-2 mb-2">
+                            <span className={`text-xs font-semibold ${
+                              message.role === 'user' ? 'text-blue-300' : 'text-yellow'
+                            }`} style={{ color: message.role === 'user' ? '#93c5fd' : '#ffcd1a' }}>
+                              {message.role === 'user' ? '👤 You' : '🤖 Sir Interruptsalot'}
+                            </span>
+                            <span className="text-xs text-white/40">
+                              {new Date(message.timestamp).toLocaleTimeString()}
+                            </span>
+                          </div>
+                          <div className="text-white/90 text-sm break-words leading-relaxed">
+                            {message.content.replace(/\[Source(?::\s*[^\]]+)?\]/g, '[Source]')}
+                          </div>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+                
+                <motion.div 
+                  className="mt-4 text-center text-xs text-white/40"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.4, delay: 2.2 }}
+                >
+                  💡 Compare this transcript with your personality analysis above!
+                </motion.div>
+              </div>
+            </Card>
+          </motion.div>
+
           {/* Enhanced Back Button */}
           <motion.div 
             className="text-center mt-10"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 1.8 }}
+            transition={{ duration: 0.6, delay: 2.0 }}
           >
             <motion.div
               whileHover={{ scale: 1.05 }}

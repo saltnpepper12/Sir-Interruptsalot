@@ -939,10 +939,10 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
             </div>
           </div>
           
-          {/* Mobile-first responsive layout */}
-          <div className="flex flex-col lg:flex-row lg:items-center gap-4 lg:gap-6">
-            {/* Timer - always visible on top for mobile */}
-            <div className={`flex items-center justify-center lg:justify-start space-x-2 px-4 py-2 rounded-lg border ${
+          {/* Desktop-only timer and controls */}
+          <div className="hidden lg:flex items-center space-x-6">
+            {/* Timer */}
+            <div className={`flex items-center space-x-2 px-4 py-2 rounded-lg border ${
               isOvertime 
                 ? 'bg-red-900/50 border-red-700 animate-pulse' 
                 : 'bg-gray-900/50 border-gray-700'
@@ -953,38 +953,89 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
               </span>
             </div>
             
-            {/* Scores and Give Up Button - flex row on mobile, aligned properly */}
-            <div className="flex items-center justify-between lg:justify-start gap-3 lg:gap-6">
-              {/* Scores */}
-              {gameStarted && (
-                <div className="flex items-center space-x-3 lg:space-x-6 bg-gray-900/50 px-3 lg:px-4 py-2 rounded-lg border border-gray-700">
-                  <div className="text-center">
-                    <p className="text-xs text-white/60">You</p>
-                    <p className="text-lg lg:text-xl font-bold text-green-400">{userScore}</p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-xs text-white/60">Bot</p>
-                    <p className="text-lg lg:text-xl font-bold text-red-400">{botScore}</p>
-                  </div>
+            {/* Scores */}
+            {gameStarted && (
+              <div className="flex items-center space-x-6 bg-gray-900/50 px-4 py-2 rounded-lg border border-gray-700">
+                <div className="text-center">
+                  <p className="text-xs text-white/60">You</p>
+                  <p className="text-xl font-bold text-green-400">{userScore}</p>
                 </div>
-              )}
-              
-              {/* Surrender Button */}
-              {gameStarted && !gameEnded && (
-                <Button
-                  onClick={handleSurrender}
-                  disabled={isSurrendering || isOvertime}
-                  onMouseEnter={() => setSurrenderHover(true)}
-                  onMouseLeave={() => setSurrenderHover(false)}
-                  className="bg-red-600/20 hover:bg-red-600/30 text-red-400 border border-red-500/30 font-semibold px-2 lg:px-4 py-2 transition-all text-sm lg:text-base whitespace-nowrap"
-                  title={isSurrendering ? "Cooking..." : isOvertime ? "No surrendering in overtime - submit your final message!" : "End the argument and get your personality report"}
-                >
-                  {isSurrendering ? "Cooking..." : surrenderHover ? "Have Mercy! 😭" : "Give Up! 🏳️"}
-                </Button>
-              )}
-            </div>
+                <div className="text-center">
+                  <p className="text-xs text-white/60">Sir Interruptsalot</p>
+                  <p className="text-xl font-bold text-red-400">{botScore}</p>
+                </div>
+              </div>
+            )}
+            
+            {/* Surrender Button */}
+            {gameStarted && !gameEnded && (
+              <Button
+                onClick={handleSurrender}
+                disabled={isSurrendering || isOvertime}
+                onMouseEnter={() => setSurrenderHover(true)}
+                onMouseLeave={() => setSurrenderHover(false)}
+                className="bg-red-600/20 hover:bg-red-600/30 text-red-400 border border-red-500/30 font-semibold px-4 py-2 transition-all"
+                title={isSurrendering ? "Cooking..." : isOvertime ? "No surrendering in overtime - submit your final message!" : "End the argument and get your personality report"}
+              >
+                {isSurrendering ? "Cooking..." : surrenderHover ? "Please, Have Mercy! 😭" : "I Give Up! 🏳️"}
+              </Button>
+            )}
           </div>
         </motion.div>
+
+        {/* Mobile Game Controls - Above Chat Area */}
+        {gameStarted && (
+          <motion.div 
+            className="lg:hidden mb-6"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <div className="bg-slate-900/50 border border-cyan-500/30 rounded-xl p-4 space-y-4">
+              {/* Timer */}
+              <div className={`flex items-center justify-center space-x-2 px-4 py-3 rounded-lg border ${
+                isOvertime 
+                  ? 'bg-red-900/50 border-red-700 animate-pulse' 
+                  : 'bg-gray-900/50 border-gray-700'
+              }`}>
+                <Clock className={`w-5 h-5 ${isOvertime ? 'text-red-400' : 'text-cyan-400'}`} style={{ color: isOvertime ? '#f87171' : '#22d3ee' }} />
+                <span className={`font-mono text-xl font-bold ${isOvertime ? 'text-red-400' : 'text-white'}`}>
+                  {isOvertime ? 'OVERTIME!' : formatTime(timeRemaining)}
+                </span>
+              </div>
+              
+              {/* Scores and Give Up Button */}
+              <div className="flex items-center justify-between gap-4">
+                {/* Scores */}
+                <div className="flex items-center space-x-4 bg-gray-900/50 px-4 py-3 rounded-lg border border-gray-700 flex-1">
+                  <div className="text-center flex-1">
+                    <p className="text-xs text-white/60 mb-1">You</p>
+                    <p className="text-2xl font-bold text-green-400">{userScore}</p>
+                  </div>
+                  <div className="w-px h-8 bg-gray-600"></div>
+                  <div className="text-center flex-1">
+                    <p className="text-xs text-white/60 mb-1">Bot</p>
+                    <p className="text-2xl font-bold text-red-400">{botScore}</p>
+                  </div>
+                </div>
+                
+                {/* Give Up Button */}
+                {!gameEnded && (
+                  <Button
+                    onClick={handleSurrender}
+                    disabled={isSurrendering || isOvertime}
+                    onMouseEnter={() => setSurrenderHover(true)}
+                    onMouseLeave={() => setSurrenderHover(false)}
+                    className="bg-red-600/20 hover:bg-red-600/30 text-red-400 border border-red-500/30 font-semibold px-4 py-3 transition-all whitespace-nowrap"
+                    title={isSurrendering ? "Cooking..." : isOvertime ? "No surrendering in overtime - submit your final message!" : "End the argument and get your personality report"}
+                  >
+                    {isSurrendering ? "Cooking..." : surrenderHover ? "Have Mercy! 😭" : "Give Up! 🏳️"}
+                  </Button>
+                )}
+              </div>
+            </div>
+          </motion.div>
+        )}
 
         {/* Main Chat Area */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">

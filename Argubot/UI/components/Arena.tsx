@@ -490,9 +490,9 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
                 ]
               }}
               transition={{ duration: 2, repeat: Infinity }}
-              className="text-4xl font-bold bg-gradient-to-r from-indigo-400 via-indigo-300 to-indigo-500 bg-clip-text text-transparent"
+              className="text-4xl font-bold bg-gradient-to-r from-white via-gray-200 to-white bg-clip-text text-transparent"
               style={{ 
-                background: 'linear-gradient(45deg, #818cf8, #a5b4fc, #818cf8)',
+                background: 'linear-gradient(45deg, #ffffff, #f3f4f6, #ffffff)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent'
               }}
@@ -543,7 +543,7 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
                 animate={{ 
                   y: [0, -15, 0],
                   scale: [1, 1.2, 1],
-                  backgroundColor: ['#818cf8', '#a5b4fc', '#818cf8']
+                  backgroundColor: ['#ffffff', '#fbbf24', '#ffffff']
                 }}
                 transition={{ 
                   duration: 1.2, 
@@ -552,7 +552,7 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
                   ease: "easeInOut"
                 }}
                 className="w-3 h-3 rounded-full shadow-lg"
-                style={{ backgroundColor: '#818cf8' }}
+                style={{ backgroundColor: '#ffffff' }}
               />
             ))}
           </motion.div>
@@ -565,11 +565,11 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
             transition={{ duration: 0.8, delay: 1.1 }}
           >
             <motion.div
-              className="h-full bg-gradient-to-r from-indigo-400 to-indigo-500 rounded-full"
+              className="h-full bg-gradient-to-r from-yellow-400 to-white rounded-full"
               initial={{ width: "0%" }}
               animate={{ width: "100%" }}
               transition={{ duration: 15, ease: "linear" }}
-              style={{ background: 'linear-gradient(90deg, #818cf8, #6366f1)' }}
+              style={{ background: 'linear-gradient(90deg, #fbbf24, #ffffff)' }}
             />
                 </motion.div>
           
@@ -649,8 +649,8 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
             transition={{ duration: 0.6 }}
           >
             <motion.h1 
-              className="text-4xl font-bold text-indigo-400 mb-4" 
-              style={{ color: '#818cf8' }}
+              className="text-4xl font-bold text-white mb-4" 
+              style={{ color: '#ffffff' }}
               initial={{ scale: 0.9 }}
               animate={{ scale: 1 }}
               transition={{ duration: 0.5, delay: 0.2 }}
@@ -726,8 +726,8 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
                   <div className="p-6">
                     <div className="flex items-center justify-between mb-4">
                       <motion.h3 
-                        className="text-lg font-semibold text-indigo-400 group-hover:text-indigo-300 transition-colors" 
-                        style={{ color: '#818cf8' }}
+                        className="text-lg font-semibold text-yellow-400 group-hover:text-yellow-300 transition-colors" 
+                        style={{ color: '#fbbf24' }}
                         whileHover={{ scale: 1.02 }}
                         transition={{ duration: 0.2 }}
                       >
@@ -815,8 +815,8 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
             <Card className="bg-gray-800 border border-gray-600 shadow-lg">
               <div className="p-6">
                 <motion.h3 
-                  className="text-xl font-semibold text-indigo-400 mb-4 flex items-center space-x-2" 
-                  style={{ color: '#818cf8' }}
+                  className="text-xl font-semibold text-yellow-400 mb-4 flex items-center space-x-2" 
+                  style={{ color: '#fbbf24' }}
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.4, delay: 1.7 }}
@@ -852,7 +852,7 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
                           <div className="flex items-center space-x-2 mb-2">
                             <span className={`text-xs font-semibold ${
                               message.role === 'user' ? 'text-blue-300' : 'text-yellow'
-                            }`} style={{ color: message.role === 'user' ? '#93c5fd' : '#818cf8' }}>
+                            }`} style={{ color: message.role === 'user' ? '#93c5fd' : '#ffffff' }}>
                               {message.role === 'user' ? '👤 You' : '🤖 Sir Interruptsalot'}
                             </span>
                             <span className="text-xs text-white/40">
@@ -893,8 +893,8 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
             >
               <Button
                 onClick={onBack}
-                className="bg-indigo-500 hover:bg-indigo-600 text-white font-semibold px-8 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300"
-                style={{ backgroundColor: '#6366f1', color: '#ffffff' }}
+                className="bg-white hover:bg-gray-100 text-black font-semibold px-8 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 border-2 border-yellow-400"
+                style={{ backgroundColor: '#ffffff', color: '#000000', borderColor: '#fbbf24' }}
               >
                 Back to Start
               </Button>
@@ -925,8 +925,8 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
               Back to Start
             </Button>
             <div className="flex items-center space-x-2">
-              <Swords className="w-5 h-5 text-indigo-400" style={{ color: '#818cf8' }} />
-              <Badge className="bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 font-semibold" style={{ backgroundColor: 'rgba(99, 102, 241, 0.2)', color: '#818cf8', borderColor: 'rgba(99, 102, 241, 0.3)' }}>
+              <Swords className="w-5 h-5 text-white" style={{ color: '#ffffff' }} />
+              <Badge className="bg-gray-700/30 text-white border border-gray-600/50 font-semibold" style={{ backgroundColor: 'rgba(55, 65, 81, 0.3)', color: '#ffffff', borderColor: 'rgba(75, 85, 99, 0.5)' }}>
                 {roomName}
               </Badge>
             </div>
@@ -939,7 +939,7 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
                 ? 'bg-red-900/50 border-red-700 animate-pulse' 
                 : 'bg-gray-900/50 border-gray-700'
             }`}>
-              <Clock className={`w-5 h-5 ${isOvertime ? 'text-red-400' : 'text-indigo-400'}`} style={{ color: isOvertime ? '#f87171' : '#818cf8' }} />
+              <Clock className={`w-5 h-5 ${isOvertime ? 'text-red-400' : 'text-yellow-400'}`} style={{ color: isOvertime ? '#f87171' : '#fbbf24' }} />
               <span className={`font-mono text-lg font-bold ${isOvertime ? 'text-red-400' : 'text-white'}`}>
                 {isOvertime ? 'OVERTIME!' : formatTime(timeRemaining)}
               </span>
@@ -979,13 +979,13 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Chat Section */}
           <div className="lg:col-span-3">
-            <Card className="bg-gray-900/50 border-2 border-indigo-500/30 backdrop-blur-sm shadow-2xl shadow-indigo-500/10 min-h-[75vh] flex flex-col" style={{ backgroundColor: 'rgba(17, 17, 17, 0.5)', borderColor: 'rgba(99, 102, 241, 0.3)' }}>
+            <Card className="bg-gray-900/50 border-2 border-gray-600/30 backdrop-blur-sm shadow-2xl shadow-gray-500/10 min-h-[75vh] flex flex-col" style={{ backgroundColor: 'rgba(17, 17, 17, 0.5)', borderColor: 'rgba(75, 85, 99, 0.3)' }}>
               {/* Messages Area */}
               <div ref={scrollContainer} className="flex-1 overflow-y-auto p-6 space-y-4 max-h-[65vh]">
                 {messages.length === 0 && !isLoading ? (
                   <div className="text-center text-white/60 py-12">
-                    <div className="w-16 h-16 bg-indigo-500/10 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: 'rgba(99, 102, 241, 0.1)' }}>
-                      <MessageCircle className="w-8 h-8 text-indigo-400" style={{ color: '#818cf8' }} />
+                    <div className="w-16 h-16 bg-gray-700/20 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: 'rgba(55, 65, 81, 0.2)' }}>
+                      <MessageCircle className="w-8 h-8 text-white" style={{ color: '#ffffff' }} />
                     </div>
                     <p className="text-lg">Waiting for Sir Interruptsalot to respond...</p>
                     <p className="text-sm text-white/40 mt-2">The debate is about to begin!</p>
@@ -1027,7 +1027,7 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
                                 ? 'bg-blue-500/20 text-blue-400' 
                                 : 'bg-yellow/20 text-yellow'
                             }`} 
-                            style={{ backgroundColor: message.role === 'user' ? 'rgba(59, 130, 246, 0.2)' : 'rgba(99, 102, 241, 0.2)', color: message.role === 'user' ? '#60a5fa' : '#818cf8' }}
+                            style={{ backgroundColor: message.role === 'user' ? 'rgba(59, 130, 246, 0.2)' : 'rgba(75, 85, 99, 0.3)', color: message.role === 'user' ? '#60a5fa' : '#ffffff' }}
                             initial={{ scale: 0, rotate: -180 }}
                             animate={{ scale: 1, rotate: 0 }}
                             transition={{ duration: 0.4, delay: index * 0.1 + 0.2 }}
@@ -1265,7 +1265,7 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
                     className={`flex-1 border rounded-xl transition-all resize-none min-h-[44px] max-h-[200px] py-3 px-4 ${
                       isOvertime 
                         ? 'bg-red-900/20 border-red-700/50 text-white placeholder-red-300/70 focus:ring-2 focus:ring-red-400 focus:border-red-400' 
-                        : 'bg-gray-800/50 border-gray-600/50 text-white placeholder-gray-400 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500'
+                        : 'bg-gray-800/50 border-gray-600/50 text-white placeholder-gray-400 focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400'
                     }`}
                     style={{ 
                       backgroundColor: isOvertime ? 'rgba(127, 29, 29, 0.2)' : 'rgba(31, 41, 55, 0.5)', 
@@ -1286,11 +1286,12 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
                     className={`font-semibold px-6 rounded-xl transition-all transform hover:scale-105 disabled:transform-none self-end ${
                       isOvertime 
                         ? 'bg-red-600 hover:bg-red-700 text-white border border-red-500' 
-                        : 'bg-indigo-500 hover:bg-indigo-600 text-white'
+                        : 'bg-white hover:bg-gray-100 text-black border-2 border-yellow-400'
                     }`}
                     style={{ 
-                      backgroundColor: isOvertime ? '#dc2626' : '#6366f1', 
-                      color: '#ffffff' 
+                      backgroundColor: isOvertime ? '#dc2626' : '#ffffff', 
+                      color: isOvertime ? '#ffffff' : '#000000',
+                      borderColor: isOvertime ? '#dc2626' : '#fbbf24'
                     }}
                   >
                     <Send className="w-4 h-4" />
@@ -1310,10 +1311,10 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
                 exit={{ opacity: 0, x: -20 }}
                 className="sticky top-6"
               >
-                <Card className="p-4 bg-indigo-500/5 border-2 border-indigo-500/30 backdrop-blur-sm shadow-lg" style={{ backgroundColor: 'rgba(99, 102, 241, 0.05)', borderColor: 'rgba(99, 102, 241, 0.3)' }}>
+                <Card className="p-4 bg-gray-700/10 border-2 border-gray-600/30 backdrop-blur-sm shadow-lg" style={{ backgroundColor: 'rgba(55, 65, 81, 0.1)', borderColor: 'rgba(75, 85, 99, 0.3)' }}>
                   <div className="flex items-center space-x-2 mb-3">
-                    <Trophy className="w-5 h-5 text-indigo-400" style={{ color: '#818cf8' }} />
-                    <span className="font-semibold text-indigo-400" style={{ color: '#818cf8' }}>
+                    <Trophy className="w-5 h-5 text-yellow-400" style={{ color: '#fbbf24' }} />
+                    <span className="font-semibold text-white" style={{ color: '#ffffff' }}>
                       Judge's Insights
                     </span>
                   </div>

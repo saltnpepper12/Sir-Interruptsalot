@@ -907,7 +907,13 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
                       </div>
                       
                             <motion.div
-                          className="text-white whitespace-pre-line leading-relaxed"
+                          className="text-white whitespace-pre-line leading-relaxed break-words overflow-wrap-anywhere"
+                          style={{ 
+                            wordWrap: 'break-word',
+                            overflowWrap: 'anywhere',
+                            hyphens: 'auto',
+                            maxWidth: '100%'
+                          }}
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
                           transition={{ duration: 0.5, delay: index * 0.1 + 0.5 }}

@@ -82,18 +82,21 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
 
   // Timer countdown with smart expiration
   useEffect(() => {
-    if (gameStarted && timeRemaining > 0 && !gameEnded) {
+    if (gameStarted && timeRemaining > 0 && !gameEnded && !allowFinalMessage) {
       const timer = setInterval(() => {
         setTimeRemaining(prev => {
           if (prev <= 1) {
             clearInterval(timer);
             // Check if user is actively typing when timer expires
+            console.log(`DEBUG Timer: isUserTyping=${isUserTyping}, userInput.length=${userInput.trim().length}`);
             if (isUserTyping && userInput.trim().length > 0) {
               // Allow them to finish their message
+              console.log("DEBUG Timer: Setting allowFinalMessage=true");
               setAllowFinalMessage(true);
               return 0; // Timer shows 0 but game continues for final message
             } else {
               // No typing activity, end game immediately
+              console.log("DEBUG Timer: No typing detected, ending session");
               endSession();
               return 0;
             }
@@ -104,7 +107,7 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
 
       return () => clearInterval(timer);
     }
-  }, [gameStarted, timeRemaining, gameEnded, isUserTyping, userInput]);
+  }, [gameStarted, timeRemaining, gameEnded, isUserTyping, userInput, allowFinalMessage]);
 
   // Cooking message rotation
   useEffect(() => {
@@ -1142,10 +1145,10 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
                         clearTimeout(typingTimeoutRef.current);
                       }
                       
-                      // Set user as not typing after 3 seconds of no activity
+                      // Set user as not typing after 1 second of no activity
                       typingTimeoutRef.current = setTimeout(() => {
                         setIsUserTyping(false);
-                      }, 3000);
+                      }, 1000);
                     }}
                     onKeyDown={handleKeyPress}
                     placeholder={allowFinalMessage ? "Final message before time's up!" : "Type your argument here..."}

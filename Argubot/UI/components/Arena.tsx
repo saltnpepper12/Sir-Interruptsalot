@@ -48,8 +48,11 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
   const [cookingMessageIndex, setCookingMessageIndex] = useState(0);
   const [surrenderHover, setSurrenderHover] = useState(false);
   const [expandedCards, setExpandedCards] = useState<Set<string>>(new Set());
+  const [isUserTyping, setIsUserTyping] = useState(false);
+  const [allowFinalMessage, setAllowFinalMessage] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const hasInitialized = useRef(false);
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const cookingMessages = [
     "Analyzing your argument patterns... 🧠",
@@ -77,15 +80,23 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
     }
   }, [initialUserMessage, sessionId, gameStarted]);
 
-  // Timer countdown
+  // Timer countdown with smart expiration
   useEffect(() => {
     if (gameStarted && timeRemaining > 0 && !gameEnded) {
       const timer = setInterval(() => {
         setTimeRemaining(prev => {
           if (prev <= 1) {
             clearInterval(timer);
-            endSession();
-            return 0;
+            // Check if user is actively typing when timer expires
+            if (isUserTyping && userInput.trim().length > 0) {
+              // Allow them to finish their message
+              setAllowFinalMessage(true);
+              return 0; // Timer shows 0 but game continues for final message
+            } else {
+              // No typing activity, end game immediately
+              endSession();
+              return 0;
+            }
           }
           return prev - 1;
         });
@@ -93,7 +104,7 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
 
       return () => clearInterval(timer);
     }
-  }, [gameStarted, timeRemaining, gameEnded]);
+  }, [gameStarted, timeRemaining, gameEnded, isUserTyping, userInput]);
 
   // Cooking message rotation
   useEffect(() => {
@@ -158,7 +169,7 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
   };
 
   const sendArgumentToAPI = async (message: string) => {
-    if (!sessionId || gameEnded) return;
+    if (!sessionId || (gameEnded && !allowFinalMessage)) return;
 
     try {
       setIsLoading(true);
@@ -206,6 +217,13 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
       // Update judge ruling if available
       if (data.status_update) {
         setCurrentJudgeRuling(data.status_update);
+      }
+
+      // If this was the final message after timer expiration, end the session
+      if (allowFinalMessage) {
+        setTimeout(() => {
+          endSession();
+        }, 2000); // Give user time to read the bot's final response
       }
 
     } catch (error) {
@@ -260,9 +278,15 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
   };
 
   const handleSubmitArgument = () => {
-    if (userInput.trim() && !isLoading && !gameEnded) {
+    if (userInput.trim() && !isLoading && (!gameEnded || allowFinalMessage)) {
       sendArgumentToAPI(userInput.trim());
       setUserInput('');
+      setIsUserTyping(false);
+      
+      // If this was the final message after timer expiration, end the game after response
+      if (allowFinalMessage) {
+        setAllowFinalMessage(false);
+      }
     }
   };
 
@@ -1087,15 +1111,46 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
                 <div ref={messagesEndRef} />
               </div>
 
+              {/* Final Message Notification */}
+              {allowFinalMessage && (
+                <motion.div 
+                  className="border-t border-gray-700/50 px-4 py-3 bg-yellow/10 border-b border-yellow/20"
+                  style={{ backgroundColor: 'rgba(255, 205, 26, 0.1)', borderBottomColor: 'rgba(255, 205, 26, 0.2)' }}
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                >
+                  <div className="flex items-center justify-center space-x-2 text-yellow" style={{ color: '#ffcd1a' }}>
+                    <Clock className="w-4 h-4" />
+                    <span className="text-sm font-semibold">⏰ Time's up! You can send one final message before the game ends.</span>
+                  </div>
+                </motion.div>
+              )}
+
               {/* Input Area */}
               <div className="border-t border-gray-700/50 p-4 bg-gray-900/30">
                 <div className="flex space-x-3">
                   <textarea
                     value={userInput}
-                    onChange={(e) => setUserInput(e.target.value)}
+                    onChange={(e) => {
+                      setUserInput(e.target.value);
+                      
+                      // Typing detection logic
+                      setIsUserTyping(true);
+                      
+                      // Clear existing timeout
+                      if (typingTimeoutRef.current) {
+                        clearTimeout(typingTimeoutRef.current);
+                      }
+                      
+                      // Set user as not typing after 3 seconds of no activity
+                      typingTimeoutRef.current = setTimeout(() => {
+                        setIsUserTyping(false);
+                      }, 3000);
+                    }}
                     onKeyDown={handleKeyPress}
-                    placeholder="Type your argument here..."
-                    disabled={isLoading || gameEnded}
+                    placeholder={allowFinalMessage ? "Final message before time's up!" : "Type your argument here..."}
+                    disabled={isLoading || (gameEnded && !allowFinalMessage)}
                     className="flex-1 bg-gray-800/50 border border-gray-600/50 text-white placeholder-white/50 rounded-xl focus:ring-2 focus:ring-yellow focus:border-yellow transition-all resize-none min-h-[44px] max-h-[200px] py-3 px-4"
                     style={{ 
                       backgroundColor: 'rgba(31, 41, 55, 0.5)', 
@@ -1112,7 +1167,7 @@ export function Arena({ roomName, onBack, initialUserMessage }: ArenaProps) {
                   />
                   <Button
                     onClick={handleSubmitArgument}
-                    disabled={!userInput.trim() || isLoading || gameEnded}
+                    disabled={!userInput.trim() || isLoading || (gameEnded && !allowFinalMessage)}
                     className="bg-yellow hover:bg-yellow/90 text-black font-semibold px-6 rounded-xl transition-all transform hover:scale-105 disabled:transform-none self-end"
                     style={{ backgroundColor: '#ffcd1a', color: '#000000' }}
                   >

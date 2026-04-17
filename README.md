@@ -1,23 +1,47 @@
 # Sir Interruptsalot
 
-`Sir Interruptsalot` is a real-time AI debate game where users argue a topic and the bot pushes back with confident, source-backed counterpoints.
+`Sir Interruptsalot` is a real-time AI debate application that challenges user arguments with confident, source-aware rebuttals.
 
-The app combines a React frontend with a FastAPI backend powered by Claude, and includes scoring, timed rounds, and end-of-session personality feedback.
+The platform pairs a React frontend with a FastAPI backend powered by Anthropic Claude, then scores each exchange and generates a final personality-style report at the end of a session.
 
-## Features
+## Key Capabilities
 
-- **Real-time debate flow** with fast response turns from Claude
-- **Live scoring** from an AI judge each round
-- **Timed sessions** to keep battles focused and competitive
-- **Personality report** at the end of each debate
-- **Source-backed arguments** using Serper search results and links
-- **Polished UI** built with modern React tooling
+- **Live debate loop** with fast AI rebuttals
+- **Round-by-round scoring** from an AI judge
+- **Time-boxed sessions** for focused gameplay
+- **Source-assisted responses** enriched via Serper search
+- **Session summary report** with score and personality feedback
+- **Modern web UI** built for responsiveness and clarity
 
-## Tech Stack
+## System Architecture
+
+```mermaid
+flowchart LR
+    U[User] --> F[React Frontend]
+    F -->|REST API| B[FastAPI Backend]
+    B -->|Generate rebuttal| C[Anthropic Claude API]
+    B -->|Fetch web context| S[Serper Search API]
+    B --> F
+    F --> U
+```
+
+## Setup Flow
+
+```mermaid
+flowchart TD
+    A[Clone repository] --> B[cd Argubot/UI]
+    B --> C[Install backend deps]
+    C --> D[Create backend/.env]
+    D --> E[Install frontend deps]
+    E --> F[Run npm run start]
+    F --> G[Open app and begin session]
+```
+
+## Technology Stack
 
 ### Frontend
 
-- React 18 + TypeScript
+- React 18 with TypeScript
 - Vite
 - Tailwind CSS
 - Framer Motion
@@ -26,22 +50,22 @@ The app combines a React frontend with a FastAPI backend powered by Claude, and 
 ### Backend
 
 - FastAPI
-- Claude (Anthropic API)
+- Anthropic Claude API
 - Pydantic
 - Uvicorn
 
 ## Prerequisites
 
-- Python 3.8+
-- Node.js 16+
+- Python 3.8 or later
+- Node.js 16 or later
 - Anthropic API key: [console.anthropic.com](https://console.anthropic.com/)
 - Serper API key: [serper.dev](https://serper.dev/)
 
 ## Quick Start
 
-### Option 1: Scripted Setup (recommended)
+### Option 1: Scripted startup (recommended)
 
-From `Argubot/UI`:
+Run from `Argubot/UI`:
 
 **Windows**
 
@@ -56,9 +80,9 @@ chmod +x start.sh
 ./start.sh
 ```
 
-### Option 2: Manual Setup
+### Option 2: Manual setup
 
-1. Move to the app directory:
+1. Navigate to the application folder:
 
 ```bash
 cd Argubot/UI
@@ -71,7 +95,7 @@ cd backend
 pip install -r requirements.txt
 ```
 
-3. Create `backend/.env`:
+3. Create `backend/.env` with your keys:
 
 ```env
 ANTHROPIC_API_KEY=your_anthropic_api_key_here
@@ -85,15 +109,34 @@ cd ..
 npm install
 ```
 
-5. Start frontend and backend together:
+5. Start both services:
 
 ```bash
 npm run start
 ```
 
+## Runtime Request Flow
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant UI as React UI
+    participant API as FastAPI
+    participant Claude as Claude API
+    participant Serper as Serper API
+
+    User->>UI: Submit argument
+    UI->>API: POST /api/argument
+    API->>Serper: Retrieve relevant context
+    API->>Claude: Generate rebuttal + score
+    Claude-->>API: Response payload
+    API-->>UI: Rebuttal + scoring data
+    UI-->>User: Render updated debate state
+```
+
 ## Development Commands
 
-From `Argubot/UI`:
+Run from `Argubot/UI`:
 
 ```bash
 # Frontend only
@@ -102,7 +145,7 @@ npm run dev
 # Backend only
 npm run backend
 
-# Both services
+# Frontend + backend
 npm run start
 
 # Production build
@@ -111,18 +154,18 @@ npm run build
 
 ## API Endpoints
 
-- `POST /api/session/start` - start a new debate session
-- `POST /api/argument` - submit a user argument and receive a rebuttal
-- `GET /api/session/{id}/status` - fetch current session state
-- `POST /api/session/{id}/end` - end a session and generate final report
+- `POST /api/session/start`: Start a new debate session
+- `POST /api/argument`: Submit a user argument and receive a rebuttal
+- `GET /api/session/{id}/status`: Retrieve current session status
+- `POST /api/session/{id}/end`: End session and generate final report
 
-## How to Play
+## User Journey
 
-1. Enter your opinion or hot take.
-2. Start the debate session.
+1. Enter an opinion or claim.
+2. Start a debate session.
 3. Respond to each AI rebuttal.
-4. Track your score as rounds progress.
-5. Review your final score and personality breakdown.
+4. Track score progression round by round.
+5. End the session and review your final report.
 
 ## Project Structure
 
@@ -138,7 +181,7 @@ Argubot/UI/
 ├── backend/
 │   ├── app.py
 │   ├── requirements.txt
-│   └── .env                  # create this file locally
+│   └── .env                 # create locally
 ├── package.json
 ├── start.sh
 ├── start.bat
@@ -147,27 +190,23 @@ Argubot/UI/
 
 ## Troubleshooting
 
-**Backend not starting**
+**Backend does not start**
 
-- Verify Python version: `python --version`
-- Install backend dependencies: `pip install -r backend/requirements.txt`
-- Confirm keys in `backend/.env`
+- Check Python version: `python --version`
+- Reinstall backend dependencies: `pip install -r backend/requirements.txt`
+- Verify `backend/.env` is present and correctly populated
 
-**Frontend not loading**
+**Frontend does not load**
 
-- Verify Node version: `node --version`
-- Reinstall dependencies: `rm -rf node_modules && npm install`
+- Check Node version: `node --version`
+- Reinstall packages: `rm -rf node_modules && npm install`
 
-**API errors**
+**API or response errors**
 
-- Confirm Anthropic and Serper keys are valid
-- Make sure backend is running on port `8000`
-- Check browser console for CORS or network errors
+- Validate Anthropic and Serper keys
+- Confirm backend is running on port `8000`
+- Inspect browser developer tools for CORS/network errors
 
 ## License
 
 MIT
-
----
-
-Ready to argue? Start the app and test your debating skills against Sir Interruptsalot.

@@ -1,180 +1,167 @@
-# Sir Interruptsalot - The Undefeated Debate Champion
+# Sir Interruptsalot
 
-An AI-powered argument bot that challenges users to debate while providing factual information and generating personality roast reports.
+A real-time AI debate app: you make an argument, an AI opponent fires back
+confident, web-grounded rebuttals, an AI judge scores each round, and you
+get a personality-style report at the end.
 
-## 🚀 Deployment on Render
+**What this project demonstrates:** shipping a complete, full-stack LLM
+product — a React/TypeScript frontend, a FastAPI backend, live Claude API
+integration, external web-search grounding (Serper), session/state
+management, and round-by-round scoring logic.
 
-This project requires **two separate services** on Render:
-
-### 1. Backend API Service
-- **Type**: Web Service (Python)
-- **Path**: `Argubot/UI/backend/`
-
-### 2. Frontend Service  
-- **Type**: Static Site
-- **Path**: `Argubot/UI/`
-
-## 📋 Manual Deployment Instructions
-
-### **Step 1: Deploy Backend API**
-
-1. Go to [Render Dashboard](https://dashboard.render.com/)
-2. Click **"New +"** → **"Web Service"**
-3. Connect your GitHub repository: `saltnpepper12/Sir-Interruptsalot`
-4. Configure settings:
-   - **Name**: `sir-interruptsalot-backend`
-   - **Environment**: `Python 3`
-   - **Build Command**: `pip install -r Argubot/UI/backend/requirements.txt`
-   - **Start Command**: `uvicorn Argubot.UI.backend.app:app --host 0.0.0.0 --port $PORT`
-
-5. Set Environment Variables:
-   ```
-   ANTHROPIC_API_KEY = your_anthropic_api_key_here
-   SERPER_API_KEY = your_serper_api_key_here (optional)
-   ```
-
-6. Click **"Create Web Service"**
-
-### **Step 2: Deploy Frontend**
-
-1. Go to [Render Dashboard](https://dashboard.render.com/)
-2. Click **"New +"** → **"Static Site"**
-3. Connect your GitHub repository: `saltnpepper12/Sir-Interruptsalot`
-4. Configure settings:
-   - **Name**: `sir-interruptsalot-frontend`
-   - **Build Command**: `cd Argubot/UI && npm install && npm run build`
-   - **Publish Directory**: `Argubot/UI/dist`
-
-5. Set Environment Variable:
-   ```
-   VITE_API_BASE_URL = https://sir-interruptsalot-backend.onrender.com
-   ```
-
-6. Click **"Create Static Site"**
-
-## 🎯 Features
-
-- ✅ **AI-powered argument bot** with personality
-- ✅ **Real-time factual information** with source citations
-- ✅ **Impartial judging system** with scoring
-- ✅ **Personality roast reports** after sessions
-- ✅ **5-minute time limit** for intense debates
-- ✅ **Beautiful dark theme UI** with animations
-- ✅ **Legal industry inspiration** popup
-- ✅ **"Let him cook" loading animations**
-
-## 🛠️ Local Development
-
-### Prerequisites
-- Node.js 18+
-- Python 3.8+
-- Anthropic API key
-- Serper API key (optional)
-
-### Backend Setup
-```bash
-cd Argubot/UI/backend
-pip install -r requirements.txt
-uvicorn app:app --reload --host 0.0.0.0 --port 8000
-```
-
-### Frontend Setup
-```bash
-cd Argubot/UI
-npm install
-npm run dev
-```
-
-### Combined Setup
-```bash
-cd Argubot/UI
-npm install
-npm run start  # Runs both frontend and backend
-```
-
-## 🌐 API Endpoints
-
-### Health Check
-```
-GET /
-GET /health
-```
-
-### Argument Session
-```
-POST /start_session
-POST /send_argument  
-POST /end_session
-```
-
-## 🔧 Environment Variables
-
-### Backend (.env)
-```env
-ANTHROPIC_API_KEY=your_anthropic_api_key_here
-SERPER_API_KEY=your_serper_api_key_here
-```
-
-### Frontend (Vite)
-```env
-VITE_API_BASE_URL=https://sir-interruptsalot-backend.onrender.com
-```
-
-## 📁 Project Structure
-
-```
-Sir-Interruptsalot/
-├── Argubot/
-│   ├── UI/ (React frontend)
-│   │   ├── components/
-│   │   ├── backend/ (FastAPI backend)
-│   │   └── package.json
-│   └── README.md
-└── SassyArguBot/ (Original Chainlit version)
-```
-
-## 🎮 How to Play
-
-1. **Enter your argument** in the text box
-2. **Click "Start Argument"** to begin
-3. **Argue back and forth** with Sir Interruptsalot
-4. **Win rounds** with logic, wit, and creativity
-5. **Get your personality roast** when you give up!
-
-## 🚀 Deployment URLs
-
-After deployment, your services will be available at:
-- **Frontend**: `https://sir-interruptsalot-frontend.onrender.com`
-- **Backend API**: `https://sir-interruptsalot-backend.onrender.com`
-
-## 🔧 Troubleshooting
-
-### Common Issues
-
-1. **API Connection Errors**
-   - Verify `VITE_API_BASE_URL` is set correctly
-   - Check backend service is running
-
-2. **Build Failures**
-   - Ensure all dependencies are installed
-   - Check Node.js and Python versions
-
-3. **Environment Variables**
-   - Verify API keys are set in Render dashboard
-   - Check variable names match exactly
-
-### Logs
-- Check Render logs for both services
-- Monitor API health endpoint: `/health`
-
-## 📞 Support
-
-For issues:
-1. Check Render deployment logs
-2. Verify environment variables
-3. Test API endpoints
-4. Review local development setup
+<!-- Add a deployed demo link here when live, e.g. https://... -->
+<!-- ![Sir Interruptsalot demo](docs/demo.gif) -->
 
 ---
 
-**Ready to challenge Sir Interruptsalot? Deploy and start arguing!** ⚔️🎉
+## Key capabilities
+
+- Live debate loop with low-latency AI rebuttals
+- Round-by-round scoring from an AI judge
+- Time-boxed 5-minute sessions with optional overtime
+- Source-grounded responses enriched via Serper web search
+- End-of-session personality roast report
+- Responsive web UI with dark mode
+
+---
+
+## Architecture
+
+```mermaid
+flowchart LR
+    U[User] --> F[React Frontend]
+    F -->|REST API| B[FastAPI Backend]
+    B -->|Generate rebuttal, judge, persona| C[Anthropic Claude API]
+    B -->|Fetch web context| S[Serper Search API]
+    B --> F
+    F --> U
+```
+
+Request flow for one round:
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant UI as React UI
+    participant API as FastAPI
+    participant Claude as Claude API
+    participant Serper as Serper API
+    User->>UI: Submit argument
+    UI->>API: POST /send_argument
+    API->>Serper: Retrieve relevant sources
+    API->>Claude: Generate rebuttal (with sources)
+    API->>Claude: Judge user vs. bot, return JSON
+    Claude-->>API: Verdict + reasoning
+    API-->>UI: Rebuttal, sources, scores, judge insight
+    UI-->>User: Render updated debate state
+```
+
+---
+
+## Tech stack
+
+**Frontend:** React 18 + TypeScript, Vite, Tailwind CSS, Radix UI, Framer Motion, Lucide
+**Backend:** FastAPI, Pydantic, Uvicorn, Anthropic Claude API, Serper Search API
+**Tooling:** ESLint, PostCSS, Autoprefixer
+
+---
+
+## Quick start
+
+**Prerequisites:** Python 3.8+ (3.11 recommended), Node.js 16+, an
+[Anthropic API key](https://console.anthropic.com/), and a
+[Serper API key](https://serper.dev/).
+
+```bash
+git clone https://github.com/saltnpepper12/Sir-Interruptsalot.git
+cd Sir-Interruptsalot
+
+# Backend
+cd backend
+pip install -r requirements.txt
+cp .env.example .env        # then add ANTHROPIC_API_KEY and SERPER_API_KEY
+
+# Frontend
+cd ..
+npm install
+
+# Run both (frontend on :5173, backend on :8000)
+npm run start
+```
+
+Or use the helper script, which performs the same steps end to end:
+
+```bash
+./start.sh        # macOS / Linux
+./start.bat       # Windows
+```
+
+### npm scripts
+
+| Script              | Description                                    |
+| ------------------- | ---------------------------------------------- |
+| `npm run dev`       | Vite dev server (frontend only, port 5173)     |
+| `npm run backend`   | Uvicorn (backend only, port 8000)              |
+| `npm run start`     | Run frontend and backend concurrently          |
+| `npm run build`     | Production build to `dist/`                    |
+| `npm run preview`   | Preview the production build                   |
+| `npm run lint`      | ESLint                                         |
+
+---
+
+## API endpoints
+
+| Method | Path              | Purpose                                    |
+| ------ | ----------------- | ------------------------------------------ |
+| `GET`  | `/health`         | Liveness check                             |
+| `POST` | `/start_session`  | Begin a session from the opening argument  |
+| `POST` | `/send_argument`  | Submit a round; returns rebuttal + score   |
+| `POST` | `/end_session`    | Close the session, return persona report   |
+
+Full backend reference: [`backend/README.md`](backend/README.md).
+
+---
+
+## Project structure
+
+```
+.
+├── src/                    # React + TypeScript frontend
+│   ├── App.tsx
+│   ├── main.tsx
+│   ├── components/         # Arena, RoomCard, Radix/shadcn UI primitives
+│   └── styles/
+├── backend/                # FastAPI service
+│   ├── app.py              # Routes, request/response models, CORS
+│   ├── argument_bot.py     # SassyArgumentBot: prompts, judging, persona
+│   ├── requirements.txt
+│   ├── render.yaml         # Render Blueprint (backend-only)
+│   └── .env.example
+├── docs/                   # Demo media (GIF / screenshots)
+├── experiments/            # Earlier prototypes — kept for history, not maintained
+├── guidelines/             # Design notes
+├── index.html              # Vite entry
+├── render.yaml             # Render Blueprint (frontend + backend)
+├── start.sh / start.bat    # One-shot dev launcher
+├── tailwind.config.js
+├── tsconfig.json
+├── vite.config.ts
+├── package.json
+└── README.md
+```
+
+---
+
+## Deployment
+
+Both services are described by `render.yaml` at the repo root and can be
+deployed in one step via a [Render Blueprint](https://render.com/docs/blueprint-spec).
+Set `ANTHROPIC_API_KEY` and `SERPER_API_KEY` in the Render dashboard under
+the backend service. The frontend reads `VITE_API_BASE_URL` at build time
+to point at the deployed backend.
+
+---
+
+## License
+
+[MIT](LICENSE)

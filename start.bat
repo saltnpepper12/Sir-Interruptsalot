@@ -1,51 +1,40 @@
 @echo off
-echo 🔥 Starting S.A.S.S.Y Argument Bot 🔥
-echo ==================================
+REM One-shot dev launcher: installs deps and starts frontend + backend together.
 
-REM Check if Python is installed
+echo Starting Sir Interruptsalot
+echo ===========================
+
 python --version >nul 2>&1
 if errorlevel 1 (
-    echo ❌ Python is not installed. Please install Python 3.8+ first.
+    echo Python 3.8+ is required.
     pause
     exit /b 1
 )
 
-REM Check if Node.js is installed
 node --version >nul 2>&1
 if errorlevel 1 (
-    echo ❌ Node.js is not installed. Please install Node.js first.
+    echo Node.js 16+ is required.
     pause
     exit /b 1
 )
 
-REM Setup backend dependencies
-echo 📦 Setting up backend dependencies...
+REM Backend
+echo Installing backend dependencies...
 cd backend
+pip install -r requirements.txt
 
 if not exist ".env" (
-    echo ⚠️  Creating .env file - please add your ANTHROPIC_API_KEY
-    echo ANTHROPIC_API_KEY=your_anthropic_api_key_here > .env
+    if exist ".env.example" copy ".env.example" ".env"
+    echo Created backend/.env -- fill in ANTHROPIC_API_KEY and SERPER_API_KEY before starting.
+    cd ..
+    pause
+    exit /b 1
 )
-
-REM Install Python dependencies
-pip install -r requirements.txt
-echo ✅ Backend setup complete!
-
-REM Go back to main directory
 cd ..
 
-REM Install frontend dependencies
-echo 📦 Installing frontend dependencies...
+REM Frontend
+echo Installing frontend dependencies...
 npm install
-echo ✅ Frontend setup complete!
 
-REM Start both frontend and backend
-echo 🚀 Starting both frontend and backend...
-echo Frontend will be available at: http://localhost:5173
-echo Backend API will be available at: http://localhost:8000
-echo.
-echo Press Ctrl+C to stop both servers
-
+echo Launching services (frontend :5173, backend :8000). Ctrl+C to stop.
 npm run start
-
-pause 
